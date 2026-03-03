@@ -1,0 +1,245 @@
+{
+  "version": "1",
+  "updated": "2026-02-27",
+  "registry": "https://conductor.thealxlabs.ca/registry.json",
+  "plugins": [
+    {
+      "id": "gmail",
+      "name": "Gmail",
+      "description": "Read, compose, send, search, and label emails. Full inbox management via OAuth 2.0.",
+      "longDescription": "Full Gmail integration — read threads, compose and send emails, search your inbox, manage labels, and handle attachments. Uses Google OAuth with minimal scopes. Tokens are stored in your local encrypted keychain, never sent anywhere.",
+      "category": "google",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/gmail",
+      "asset": "gmail.js",
+      "credentials": [
+        { "service": "google", "key": "access_token", "label": "Google OAuth", "setup": "conductor google" }
+      ],
+      "tools": ["gmail_read", "gmail_send", "gmail_search", "gmail_label", "gmail_trash", "gmail_reply"],
+      "tags": ["google", "email", "productivity"],
+      "icon": "📧",
+      "requiresGoogle": true
+    },
+    {
+      "id": "gcal",
+      "name": "Google Calendar",
+      "description": "Create, read, update, and delete calendar events. Check availability and schedule meetings.",
+      "longDescription": "Full Google Calendar integration. List events, create meetings with attendees, check your schedule, update or delete events, and find free time slots. Works with all your calendars — personal, work, shared.",
+      "category": "google",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/gcal",
+      "asset": "gcal.js",
+      "credentials": [
+        { "service": "google", "key": "access_token", "label": "Google OAuth", "setup": "conductor google" }
+      ],
+      "tools": ["gcal_list", "gcal_create", "gcal_update", "gcal_delete", "gcal_availability"],
+      "tags": ["google", "calendar", "productivity"],
+      "icon": "📅",
+      "requiresGoogle": true
+    },
+    {
+      "id": "gdrive",
+      "name": "Google Drive",
+      "description": "Search, read, upload, and manage files in Google Drive.",
+      "longDescription": "Search and browse your Drive, read file contents, upload new files, create folders, share files, and manage permissions. Supports Docs, Sheets, PDFs, and any other file type.",
+      "category": "google",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/gdrive",
+      "asset": "gdrive.js",
+      "credentials": [
+        { "service": "google", "key": "access_token", "label": "Google OAuth", "setup": "conductor google" }
+      ],
+      "tools": ["gdrive_search", "gdrive_read", "gdrive_upload", "gdrive_create_folder", "gdrive_share"],
+      "tags": ["google", "files", "storage"],
+      "icon": "🗂️",
+      "requiresGoogle": true
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "description": "Manage repos, issues, PRs, commits, and code search across your GitHub account.",
+      "longDescription": "Full GitHub integration — search code, list and create issues, review pull requests, read file contents, manage repos, check CI status, and browse your organization. Works with public and private repos.",
+      "category": "developer",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/github",
+      "asset": "github.js",
+      "credentials": [
+        { "service": "github", "key": "token", "label": "GitHub Personal Access Token", "setup": "conductor plugins config github token <TOKEN>" }
+      ],
+      "tools": ["github_search_code", "github_list_issues", "github_create_issue", "github_list_prs", "github_read_file", "github_list_repos"],
+      "tags": ["developer", "git", "code"],
+      "icon": "🐙"
+    },
+    {
+      "id": "github-actions",
+      "name": "GitHub Actions",
+      "description": "Trigger workflows, monitor CI runs, and view build logs directly from Conductor.",
+      "longDescription": "Trigger GitHub Actions workflows, list recent runs, check run status, view logs for failed jobs, and re-run failed workflows. Essential for developer automation.",
+      "category": "developer",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/github-actions",
+      "asset": "github-actions.js",
+      "credentials": [
+        { "service": "github", "key": "token", "label": "GitHub Personal Access Token", "setup": "conductor plugins config github token <TOKEN>" }
+      ],
+      "tools": ["actions_list_runs", "actions_trigger", "actions_logs", "actions_rerun"],
+      "tags": ["developer", "ci", "automation"],
+      "icon": "⚙️"
+    },
+    {
+      "id": "notion",
+      "name": "Notion",
+      "description": "Read and write Notion pages, databases, and blocks. Full workspace search.",
+      "longDescription": "Search your Notion workspace, read page contents, create and update pages, query databases, and add blocks. Works with all your shared workspaces.",
+      "category": "productivity",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/notion",
+      "asset": "notion.js",
+      "credentials": [
+        { "service": "notion", "key": "api_key", "label": "Notion Integration Token", "setup": "conductor plugins config notion api_key <TOKEN>" }
+      ],
+      "tools": ["notion_search", "notion_read_page", "notion_create_page", "notion_update_page", "notion_query_db"],
+      "tags": ["productivity", "notes", "database"],
+      "icon": "📝"
+    },
+    {
+      "id": "slack",
+      "name": "Slack",
+      "description": "Send messages, read channels, search conversations, and manage your Slack workspace.",
+      "longDescription": "Full Slack integration — send messages to channels or DMs, read channel history, search across all conversations, list workspace members, and add emoji reactions. Requires a Slack Bot token.",
+      "category": "messaging",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/slack",
+      "asset": "slack.js",
+      "credentials": [
+        { "service": "slack", "key": "bot_token", "label": "Slack Bot Token (xoxb-...)", "setup": "conductor slack setup" }
+      ],
+      "tools": ["slack_send_message", "slack_channels", "slack_read_channel", "slack_search", "slack_users", "slack_add_reaction"],
+      "tags": ["messaging", "team", "communication"],
+      "icon": "💬"
+    },
+    {
+      "id": "spotify",
+      "name": "Spotify",
+      "description": "Control playback, search music, manage playlists, and browse your Spotify library.",
+      "longDescription": "Full Spotify control — play, pause, skip, queue tracks, search songs and albums, create and edit playlists, get recommendations, and check what's currently playing.",
+      "category": "media",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/spotify",
+      "asset": "spotify.js",
+      "credentials": [
+        { "service": "spotify", "key": "client_id", "label": "Spotify Client ID", "setup": "conductor plugins config spotify client_id <ID>" },
+        { "service": "spotify", "key": "client_secret", "label": "Spotify Client Secret", "setup": "conductor plugins config spotify client_secret <SECRET>" }
+      ],
+      "tools": ["spotify_play", "spotify_pause", "spotify_search", "spotify_queue", "spotify_playlists", "spotify_now_playing"],
+      "tags": ["music", "media", "entertainment"],
+      "icon": "🎵"
+    },
+    {
+      "id": "vercel",
+      "name": "Vercel",
+      "description": "Monitor deployments, check build logs, manage projects, and trigger redeploys.",
+      "longDescription": "Full Vercel integration — list projects and deployments, check deployment status, view build logs, trigger new deployments, manage environment variables, and monitor domain aliases.",
+      "category": "developer",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/vercel",
+      "asset": "vercel.js",
+      "credentials": [
+        { "service": "vercel", "key": "token", "label": "Vercel API Token", "setup": "conductor plugins config vercel token <TOKEN>" }
+      ],
+      "tools": ["vercel_list_projects", "vercel_deployments", "vercel_logs", "vercel_redeploy", "vercel_env"],
+      "tags": ["developer", "deployment", "hosting"],
+      "icon": "▲"
+    },
+    {
+      "id": "n8n",
+      "name": "n8n",
+      "description": "Trigger workflows, list executions, and monitor your n8n automation server.",
+      "longDescription": "Connect to your self-hosted n8n instance — trigger workflows by name, list active workflows, check recent executions, and retrieve execution logs. Perfect for building AI-triggered automation pipelines.",
+      "category": "automation",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/n8n",
+      "asset": "n8n.js",
+      "credentials": [
+        { "service": "n8n", "key": "api_key", "label": "n8n API Key", "setup": "conductor plugins config n8n api_key <KEY>" }
+      ],
+      "tools": ["n8n_trigger", "n8n_list_workflows", "n8n_executions", "n8n_logs"],
+      "tags": ["automation", "workflows", "developer"],
+      "icon": "🔄"
+    },
+    {
+      "id": "weather",
+      "name": "Weather",
+      "description": "Get current conditions, forecasts, and weather alerts for any location.",
+      "longDescription": "Real-time weather data — current conditions, hourly and daily forecasts, precipitation, wind, UV index, and weather alerts. Supports any city or coordinates worldwide via OpenWeatherMap.",
+      "category": "utilities",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/weather",
+      "asset": "weather.js",
+      "credentials": [
+        { "service": "weather", "key": "api_key", "label": "OpenWeatherMap API Key", "setup": "conductor plugins config weather api_key <KEY>" }
+      ],
+      "tools": ["weather_current", "weather_forecast", "weather_alerts"],
+      "tags": ["weather", "utilities", "data"],
+      "icon": "🌤️"
+    },
+    {
+      "id": "x",
+      "name": "X (Twitter)",
+      "description": "Post tweets, search X, get user info, and manage your timeline.",
+      "longDescription": "Full X (Twitter) integration — post tweets, reply and quote, search posts, get user profiles and timelines, like and retweet, and manage your feed. Supports both read-only (Bearer Token) and write access (OAuth 1.0a).",
+      "category": "social",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/x",
+      "asset": "x.js",
+      "credentials": [
+        { "service": "x", "key": "bearer_token", "label": "X Bearer Token", "setup": "conductor plugins config x bearer_token <TOKEN>" }
+      ],
+      "tools": ["x_post", "x_search", "x_user", "x_timeline", "x_like", "x_retweet"],
+      "tags": ["social", "twitter", "media"],
+      "icon": "𝕏"
+    },
+    {
+      "id": "homekit",
+      "name": "HomeKit",
+      "description": "Control smart home devices via Homebridge — lights, locks, thermostats, and more.",
+      "longDescription": "Full HomeKit control via your Homebridge instance. List all accessories by room, get device states, toggle lights and switches, set brightness and temperature, lock doors, and check connectivity. Requires Homebridge with homebridge-config-ui-x.",
+      "category": "smart-home",
+      "author": "TheAlxLabs",
+      "version": "1.0.0",
+      "repo": "thealxlabs/conductor-plugins",
+      "path": "plugins/homekit",
+      "asset": "homekit.js",
+      "credentials": [
+        { "service": "homekit", "key": "base_url", "label": "Homebridge URL", "setup": "conductor plugins config homekit base_url http://homebridge.local:8581" }
+      ],
+      "tools": ["homekit_status", "homekit_accessories", "homekit_get_accessory", "homekit_set", "homekit_toggle", "homekit_rooms"],
+      "tags": ["smart-home", "homekit", "iot"],
+      "icon": "🏠"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "framework": null,
+  "routes": [
+    {
+      "src": "/install.sh",
+      "dest": "/install.sh"
+    },
+    {
+      "src": "/install.ps1",
+      "dest": "/install.ps1"
+    },
+    {
+      "src": "/registry.json",
+      "dest": "/registry.json"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
