@@ -1,136 +1,237 @@
 import Link from "next/link";
-import { ArrowRight, Shield, Lock, FileCheck, Eye, Key } from "lucide-react";
+import { ArrowRight, Shield, Lock, FileCheck, Eye, AlertTriangle, Key } from "lucide-react";
+import { CopyButton } from "@/components/copy-button";
+
+const securityCards = [
+  {
+    icon: Lock,
+    title: "AES-256-GCM Encryption",
+    description:
+      "Secrets are encrypted at rest using AES-256-GCM. The encryption key is derived from the machine ID and stored in the OS keychain.",
+  },
+  {
+    icon: Shield,
+    title: "Command Allowlisting",
+    description:
+      "The shell plugin enforces a strict allowlist. Only explicitly permitted commands can be executed — no wildcards.",
+  },
+  {
+    icon: FileCheck,
+    title: "Approval Gates",
+    description:
+      "Dangerous tools set requiresApproval: true. Execution halts until the user explicitly approves via the terminal or dashboard.",
+  },
+  {
+    icon: Eye,
+    title: "Audit Logging",
+    description:
+      "SHA-256 chained append-only log at ~/.conductor/audit.log. Any modification breaks the chain, making tampering detectable.",
+  },
+  {
+    icon: AlertTriangle,
+    title: "Circuit Breakers",
+    description:
+      "Each tool has an independent circuit breaker. After repeated failures the circuit opens, preventing cascading errors.",
+  },
+  {
+    icon: Key,
+    title: "OS Keychain Integration",
+    description:
+      "Secrets are stored in the OS keychain: macOS Keychain, Windows Credential Manager, or Linux libsecret.",
+  },
+];
+
+const circuitStates = `// Circuit breaker states
+CLOSED    → Normal operation, requests pass through
+OPEN      → All requests fail fast (circuit tripped)
+HALF_OPEN → Testing whether the service has recovered`;
+
+const allowlistConfig = `// ~/.conductor/config.json
+{
+  "plugins": {
+    "shell": {
+      "allowedCommands": [
+        "ls", "cat", "echo", "pwd", "git", "npm", "node"
+      ],
+      "requireApproval": ["rm", "mv", "cp", "chmod"]
+    }
+  }
+}`;
+
+const auditEntry = `{
+  "id": "evt_01HXYZ",
+  "timestamp": "2026-01-15T10:23:45.123Z",
+  "tool": "filesystem.write",
+  "input": { "path": "/home/user/app/index.ts" },
+  "result": "success",
+  "hash": "sha256:a3f9b2...",
+  "prevHash": "sha256:4c8d1e..."
+}`;
 
 export default function SecurityPage() {
   return (
     <div>
+      {/* Header */}
       <div className="mb-12">
-        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
+        <p className="mb-3 text-[10px] font-mono uppercase tracking-[0.25em] text-[#3a3a3a]">
           Core
         </p>
         <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
           Security
         </h1>
-        <p className="mt-3 text-[#888]">
-          Encryption, approval gates, and audit logging.
+        <p className="mt-3 text-[#666]">
+          Defense-in-depth: encryption, approval gates, audit logging, and
+          circuit breakers.
         </p>
       </div>
 
-      <div className="space-y-10">
+      <div className="space-y-12">
+        {/* Security model overview */}
         <section>
           <h2 className="mb-4 font-mono text-xl font-semibold">
             Security Model
           </h2>
-          <p className="mb-6 text-sm leading-relaxed text-[#888]">
-            Conductor is designed with a defense-in-depth approach. Every layer
-            has security controls, and no single point of failure compromises
-            the system.
+          <p className="mb-6 text-sm leading-relaxed text-[#666]">
+            Conductor is designed with defense-in-depth. Every layer has
+            independent security controls — no single failure compromises the
+            system. Secrets never touch config files. Dangerous operations
+            require explicit approval. Every action is logged immutably.
           </p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
-              <Lock className="mb-3 h-5 w-5 text-[#555]" />
-              <h3 className="mb-2 font-mono text-sm font-semibold">
-                AES-256-GCM Encryption
-              </h3>
-              <p className="text-xs leading-relaxed text-[#666]">
-                Secrets are encrypted at rest using AES-256-GCM. The encryption
-                key is derived from the machine ID and stored in the OS
-                keychain.
-              </p>
-            </div>
-            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
-              <Shield className="mb-3 h-5 w-5 text-[#555]" />
-              <h3 className="mb-2 font-mono text-sm font-semibold">
-                Command Whitelisting
-              </h3>
-              <p className="text-xs leading-relaxed text-[#666]">
-                The shell plugin uses a strict allowlist. No eval() or exec().
-                Only explicitly permitted commands can be executed.
-              </p>
-            </div>
-            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
-              <FileCheck className="mb-3 h-5 w-5 text-[#555]" />
-              <h3 className="mb-2 font-mono text-sm font-semibold">
-                Approval Gates
-              </h3>
-              <p className="text-xs leading-relaxed text-[#666]">
-                Dangerous tools set requiresApproval: true. The user must
-                explicitly approve before execution proceeds.
-              </p>
-            </div>
-            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
-              <Eye className="mb-3 h-5 w-5 text-[#555]" />
-              <h3 className="mb-2 font-mono text-sm font-semibold">
-                Audit Logging
-              </h3>
-              <p className="text-xs leading-relaxed text-[#666]">
-                SHA-256 chained append-only log at ~/.conductor/audit.log.
-                Tamper-evident — any modification breaks the chain.
-              </p>
-            </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {securityCards.map((card) => (
+              <div
+                key={card.title}
+                className="rounded-lg border border-[#1a1a1a] bg-[#080808] p-5"
+              >
+                <card.icon className="mb-3 h-5 w-5 text-[#444]" />
+                <h3 className="mb-2 font-mono text-sm font-semibold">
+                  {card.title}
+                </h3>
+                <p className="text-xs leading-relaxed text-[#555]">
+                  {card.description}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
+        {/* Secret management */}
         <section>
           <h2 className="mb-4 font-mono text-xl font-semibold">
             Secret Management
           </h2>
-          <p className="mb-4 text-sm leading-relaxed text-[#888]">
-            Secrets (API keys, tokens, passwords) are never stored in
-            config.json. Instead, they are:
+          <p className="mb-4 text-sm leading-relaxed text-[#666]">
+            Secrets (API keys, tokens, passwords) are never stored in{" "}
+            <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">
+              config.json
+            </code>
+            . The flow:
           </p>
-          <ol className="list-inside space-y-2 text-sm text-[#888]">
-            <li className="flex items-start gap-2">
-              <span className="mt-1 font-mono text-xs text-[#555]">1.</span>
-              Marked with secret: true in the plugin configSchema
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 font-mono text-xs text-[#555]">2.</span>
-              Encrypted with AES-256-GCM using a machine-bound key
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 font-mono text-xs text-[#555]">3.</span>
-              Stored in the OS keychain (macOS Keychain, Windows Credential
-              Manager, Linux libsecret)
-            </li>
+          <ol className="space-y-3">
+            {[
+              "Plugin configSchema marks the field with secret: true",
+              "conductor config setup prompts for the value",
+              "Value is encrypted with AES-256-GCM using a machine-bound key",
+              "Encrypted value is stored in the OS keychain",
+              "At runtime, Conductor decrypts on demand — never written to disk",
+            ].map((step, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm text-[#666]">
+                <span className="mt-0.5 shrink-0 font-mono text-xs text-[#2a2a2a]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {step}
+              </li>
+            ))}
           </ol>
         </section>
 
+        {/* Shell allowlist */}
         <section>
           <h2 className="mb-4 font-mono text-xl font-semibold">
-            Circuit Breaker
+            Shell Allowlist
           </h2>
-          <p className="mb-4 text-sm leading-relaxed text-[#888]">
-            Each tool has an independent circuit breaker that opens after
-            repeated failures, preventing cascading errors and resource
-            exhaustion.
+          <p className="mb-4 text-sm leading-relaxed text-[#666]">
+            The shell plugin uses a strict allowlist — no wildcard permissions.
+            Configure allowed and approval-required commands in your config:
           </p>
-          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
-            <pre className="p-4 text-xs font-mono text-[#ccc]">
-              <code>{`// Circuit breaker states
-CLOSED   → Normal operation, requests pass through
-OPEN     → All requests fail fast (no execution)
-HALF_OPEN → Testing if service recovered`}</code>
+          <div className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#080808]">
+            <div className="flex items-center justify-between border-b border-[#1a1a1a] px-4 py-3">
+              <span className="font-mono text-[10px] text-[#3a3a3a]">
+                ~/.conductor/config.json
+              </span>
+              <CopyButton text={allowlistConfig} />
+            </div>
+            <pre className="p-4 text-xs font-mono leading-relaxed text-[#888]">
+              <code>{allowlistConfig}</code>
             </pre>
           </div>
         </section>
 
+        {/* Circuit breaker */}
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Circuit Breaker
+          </h2>
+          <p className="mb-4 text-sm leading-relaxed text-[#666]">
+            Each tool has an independent circuit breaker. After 5 consecutive
+            failures the circuit opens. All requests fail immediately until the
+            half-open probe succeeds.
+          </p>
+          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#080808]">
+            <pre className="p-4 text-xs font-mono leading-relaxed text-[#888]">
+              <code>{circuitStates}</code>
+            </pre>
+          </div>
+        </section>
+
+        {/* Audit log */}
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">Audit Log</h2>
+          <p className="mb-4 text-sm leading-relaxed text-[#666]">
+            Every tool call is appended to{" "}
+            <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">
+              ~/.conductor/audit.log
+            </code>
+            . Each entry includes a SHA-256 hash of the previous entry —
+            forming a chain that makes any tampering detectable.
+          </p>
+          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#080808]">
+            <pre className="p-4 text-xs font-mono leading-relaxed text-[#888]">
+              <code>{auditEntry}</code>
+            </pre>
+          </div>
+          <p className="mt-3 text-xs text-[#444]">
+            View the audit log with{" "}
+            <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">
+              conductor audit list
+            </code>{" "}
+            or query it via the HTTP API at{" "}
+            <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">
+              GET /audit
+            </code>
+            .
+          </p>
+        </section>
+
+        {/* Rate limiting */}
         <section>
           <h2 className="mb-4 font-mono text-xl font-semibold">
             Rate Limiting
           </h2>
-          <p className="text-sm leading-relaxed text-[#888]">
-            All HTTP endpoints are protected by express-rate-limit. The
-            dashboard and webhook endpoints have independent rate limit
-            configurations.
+          <p className="text-sm leading-relaxed text-[#666]">
+            When running with HTTP transport, all endpoints are protected by
+            configurable rate limits using express-rate-limit. The dashboard,
+            webhook, and tool endpoints have independent limits. Defaults are
+            100 requests per minute per IP.
           </p>
         </section>
       </div>
 
-      <div className="mt-12 flex items-center gap-4 border-t border-[#1a1a1a] pt-8">
+      {/* Next */}
+      <div className="mt-12 border-t border-[#1a1a1a] pt-8">
         <Link
           href="/docs/webhooks"
-          className="inline-flex items-center gap-2 text-sm text-[#888] transition-colors hover:text-white"
+          className="inline-flex items-center gap-2 text-sm text-[#777] transition-colors hover:text-white"
         >
           Next: Webhooks
           <ArrowRight className="h-3.5 w-3.5" />

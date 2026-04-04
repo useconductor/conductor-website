@@ -16,7 +16,8 @@ const docsNav = [
     section: "Core",
     links: [
       { href: "/docs/mcp-server", label: "MCP Server" },
-      { href: "/docs/plugins", label: "Plugins" },
+      { href: "/docs/plugins", label: "Plugin System" },
+      { href: "/docs/zero-config", label: "Zero-Config Plugins" },
       { href: "/docs/security", label: "Security" },
       { href: "/docs/webhooks", label: "Webhooks" },
     ],
@@ -24,6 +25,8 @@ const docsNav = [
   {
     section: "Reference",
     links: [
+      { href: "/docs/cli", label: "CLI Reference" },
+      { href: "/docs/mcp-compatibility", label: "MCP Compatibility" },
       { href: "/docs/api-reference", label: "API Reference" },
       { href: "/docs/sdks", label: "SDKs" },
     ],

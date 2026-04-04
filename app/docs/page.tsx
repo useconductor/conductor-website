@@ -1,64 +1,70 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  Book,
-  Zap,
-  Shield,
-  Plug,
-  Webhook,
-  Code2,
-  FileText,
-  HelpCircle,
-} from "lucide-react";
+import { ArrowRight, Terminal, Settings, Package, Shield, Webhook, FileText, HelpCircle, BookOpen, Code2, Zap } from "lucide-react";
+import { CopyButton } from "@/components/copy-button";
 
-const docCards = [
+const quickLinks = [
   {
     icon: Zap,
     title: "Quick Start",
-    description: "Get up and running in 5 minutes",
+    description: "Install, connect your AI client, verify tools are available.",
     href: "/docs/quickstart",
+    tag: "Start here",
   },
   {
-    icon: Plug,
-    title: "MCP Server",
-    description: "Understanding the MCP protocol integration",
-    href: "/docs/mcp-server",
-  },
-  {
-    icon: Code2,
-    title: "Plugins",
-    description: "Plugin system architecture and API",
+    icon: Package,
+    title: "Plugin Reference",
+    description: "Every plugin, every tool, with input/output examples.",
     href: "/docs/plugins",
+    tag: null,
+  },
+  {
+    icon: Settings,
+    title: "Configuration",
+    description: "Config file, environment variables, CLI commands.",
+    href: "/docs/mcp-server",
+    tag: null,
   },
   {
     icon: Shield,
     title: "Security",
-    description: "Encryption, approvals, and audit logging",
+    description: "Allowlists, approval gates, encryption, audit logs.",
     href: "/docs/security",
+    tag: null,
   },
   {
     icon: Webhook,
     title: "Webhooks",
-    description: "Event-driven integrations",
+    description: "Incoming triggers and outgoing events.",
     href: "/docs/webhooks",
+    tag: null,
   },
   {
     icon: FileText,
     title: "API Reference",
-    description: "Complete tool and endpoint reference",
+    description: "Every tool signature and HTTP endpoint.",
     href: "/docs/api-reference",
+    tag: null,
   },
   {
-    icon: Book,
+    icon: Code2,
+    title: "SDKs",
+    description: "TypeScript and Python client libraries.",
+    href: "/docs/sdks",
+    tag: null,
+  },
+  {
+    icon: BookOpen,
     title: "Guides",
-    description: "Step-by-step tutorials and walkthroughs",
+    description: "Custom plugins, remote deployment, integrations.",
     href: "/docs/guides",
+    tag: null,
   },
   {
     icon: HelpCircle,
     title: "FAQ",
-    description: "Frequently asked questions",
+    description: "Common questions and troubleshooting.",
     href: "/docs/faq",
+    tag: null,
   },
 ];
 
@@ -66,31 +72,51 @@ export default function DocsPage() {
   return (
     <div>
       <div className="mb-12">
-        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
+        <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-[#3a3a3a]">
           Documentation
         </p>
         <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
           Conductor Docs
         </h1>
-        <p className="mt-3 text-[#888]">
-          Everything you need to know about installing, configuring, and using
-          Conductor.
+        <p className="mt-3 text-[#666]">
+          Everything you need to install, configure, and extend Conductor.
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {docCards.map((card) => (
+      {/* Install callout */}
+      <div className="mb-10 overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#080808]">
+        <div className="border-b border-[#1a1a1a] px-4 py-2.5">
+          <span className="font-mono text-[10px] text-[#3a3a3a]">install</span>
+        </div>
+        <div className="flex items-center justify-between p-4">
+          <code className="font-mono text-sm text-[#aaa]">
+            npm install -g @thealxlabs/conductor
+          </code>
+          <CopyButton text="npm install -g @thealxlabs/conductor" />
+        </div>
+      </div>
+
+      {/* Links */}
+      <div className="grid gap-2 sm:grid-cols-2">
+        {quickLinks.map((card) => (
           <Link
             key={card.href}
             href={card.href}
-            className="group flex items-start gap-4 rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5 transition-colors hover:border-[#333]"
+            className="group flex items-start gap-4 rounded-lg border border-[#1a1a1a] bg-[#080808] p-5 transition-colors hover:border-[#2a2a2a]"
           >
-            <card.icon className="mt-0.5 h-5 w-5 text-[#555]" />
-            <div>
-              <h3 className="font-mono text-sm font-semibold">{card.title}</h3>
-              <p className="mt-1 text-xs text-[#666]">{card.description}</p>
+            <card.icon className="mt-0.5 h-4 w-4 shrink-0 text-[#444]" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-mono text-sm font-semibold">{card.title}</h3>
+                {card.tag && (
+                  <span className="rounded border border-[#1a1a1a] px-1.5 py-0.5 font-mono text-[9px] text-[#555]">
+                    {card.tag}
+                  </span>
+                )}
+              </div>
+              <p className="mt-0.5 text-xs text-[#555]">{card.description}</p>
             </div>
-            <ArrowRight className="ml-auto mt-0.5 h-4 w-4 text-[#333] transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#2a2a2a] transition-transform group-hover:translate-x-0.5" />
           </Link>
         ))}
       </div>
