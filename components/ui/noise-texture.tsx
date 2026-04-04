@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useId } from "react";
 import { cn } from "@/lib/utils";
 
 interface NoiseTextureProps {
@@ -10,7 +10,7 @@ interface NoiseTextureProps {
 }
 
 export function NoiseTexture({ className, opacity = 0.03 }: NoiseTextureProps) {
-  const [seed] = useState(() => Math.random().toString(36).substring(7));
+  const id = useId();
 
   return (
     <div
@@ -18,7 +18,7 @@ export function NoiseTexture({ className, opacity = 0.03 }: NoiseTextureProps) {
       style={{ opacity }}
     >
       <svg className="w-full h-full">
-        <filter id={`noise-${seed}`}>
+        <filter id={`noise-${id}`}>
           <feTurbulence
             type="fractalNoise"
             baseFrequency="0.9"
@@ -27,7 +27,7 @@ export function NoiseTexture({ className, opacity = 0.03 }: NoiseTextureProps) {
           />
           <feColorMatrix type="saturate" values="0" />
         </filter>
-        <rect width="100%" height="100%" filter={`url(#noise-${seed})`} />
+        <rect width="100%" height="100%" filter={`url(#noise-${id})`} />
       </svg>
     </div>
   );
