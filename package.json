@@ -1,40 +1,29 @@
 {
   "name": "conductor-website",
   "version": "1.0.0",
-  "description": "Static website for [Conductor](https://github.com/thealxlabs/conductor) — the AI integration hub by TheAlxLabs.",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/thegreatalxx/conductor-website.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/thegreatalxx/conductor-website/issues"
-  },
-  "homepage": "https://github.com/thegreatalxx/conductor-website#readme",
   "dependencies": {
-    "@types/node": "^25.5.2",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "autoprefixer": "^10.4.27",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "framer-motion": "^11.3.0",
+    "lucide-react": "^0.400.0",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.38.0",
-    "lucide-react": "^1.7.0",
-    "next": "^16.2.2",
-    "postcss": "^8.5.8",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.2",
-    "typescript": "^6.0.2"
+    "tailwind-merge": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.0",
+    "tailwindcss": "^3.4.4",
+    "postcss": "^8.4.38",
+    "autoprefixer": "^10.4.19"
   }
 }

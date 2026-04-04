@@ -1,149 +1,129 @@
-import { CodeBlock } from "@/components/code-block";
-import {
-  Webhook,
-  Bell,
-  ArrowRight,
-  Server,
-  Filter,
-  Shield,
-  Activity,
-  Zap,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Webhook, Bell, Server } from "lucide-react";
 
 export default function WebhooksPage() {
   return (
     <div>
       <div className="mb-12">
-        <div className="flex items-center gap-2 text-sm text-[#ff6b2b] mb-4">
-          <Webhook className="h-4 w-4" />
-          Integration
-        </div>
-        <h1 className="text-4xl font-bold mb-4">Webhooks</h1>
-        <p className="text-lg text-white/50 max-w-2xl">
-          Set up webhook endpoints to receive real-time events from Conductor
-          and external services. Build reactive automation pipelines that
-          respond to tool calls, plugin events, and system changes.
+        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
+          Core
+        </p>
+        <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
+          Webhooks
+        </h1>
+        <p className="mt-3 text-[#888]">
+          Event-driven integrations with external systems.
         </p>
       </div>
-      <div className="prose prose-invert max-w-none">
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Overview</h2>
-        <p className="text-white/60 leading-relaxed">
-          Webhooks allow external services to notify Conductor of events, and
-          allow Conductor to notify external services about tool executions,
-          plugin state changes, and system events.
-        </p>
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Event Types</h2>
-        <CodeBlock
-          code={`// Available webhook events
-const EVENTS = {
-  'tool.call':       // A tool was called
-  'tool.complete',   // A tool call completed
-  'tool.error',      // A tool call failed
-  'plugin.enable',   // A plugin was enabled
-  'plugin.disable',  // A plugin was disabled
-  'plugin.init',     // A plugin was initialized
-  'config.change',   // Configuration was modified
-  'health.degraded', // System health degraded
-  'audit.entry',     // New audit log entry
-}`}
-          language="typescript"
-          filename="events.ts"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Configuring Webhooks
-        </h2>
-        <CodeBlock
-          code={`# Add a webhook endpoint
-conductor webhooks add https://example.com/hook \
-  --events tool.call,tool.complete,tool.error
 
-# List all webhooks
-conductor webhooks list
+      <div className="space-y-10">
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">Overview</h2>
+          <p className="text-sm leading-relaxed text-[#888]">
+            Conductor supports both incoming and outgoing webhooks. Incoming
+            webhooks allow external systems to trigger actions in Conductor.
+            Outgoing webhooks send events to external endpoints when specific
+            actions occur.
+          </p>
+        </section>
 
-# Test a webhook
-conductor webhooks test <webhook-id>
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Incoming Webhooks
+          </h2>
+          <p className="mb-4 text-sm leading-relaxed text-[#888]">
+            Register a webhook endpoint that external services can POST to. The
+            payload is validated and routed to the appropriate handler.
+          </p>
+          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+            <pre className="p-4 text-xs font-mono text-[#ccc]">
+              <code>{`// Register a webhook
+conductor webhooks create \
+  --name "github-events" \
+  --url /hooks/github \
+  --handler "process_github_event"`}</code>
+            </pre>
+          </div>
+        </section>
 
-# Remove a webhook
-conductor webhooks remove <webhook-id>`}
-          language="bash"
-          filename="Terminal"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Webhook Payload</h2>
-        <CodeBlock
-          code={`{
-  "id": "evt_1a2b3c4d",
-  "type": "tool.complete",
-  "timestamp": "2026-04-04T12:00:00Z",
-  "data": {
-    "tool": "shell",
-    "action": "execute",
-    "status": "success",
-    "duration_ms": 245,
-    "result": { "output": "done" }
-  },
-  "signature": "sha256=abc123..."
-}`}
-          language="json"
-          filename="webhook-payload.json"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Signature Verification
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          All webhook payloads are signed with HMAC-SHA256. Verify the signature
-          using the secret provided when the webhook was created.
-        </p>
-        <CodeBlock
-          code={`// Verify webhook signature
-const crypto = require('crypto');
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Outgoing Webhooks
+          </h2>
+          <p className="mb-4 text-sm leading-relaxed text-[#888]">
+            Configure Conductor to send events to external URLs. Events include
+            tool executions, plugin state changes, and system alerts.
+          </p>
+          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+            <pre className="p-4 text-xs font-mono text-[#ccc]">
+              <code>{`// Register an outgoing webhook
+conductor webhooks register \
+  --url "https://example.com/conductor-events" \
+  --events "tool.call,tool.complete,plugin.error" \
+  --secret "whsec_your_signing_secret"`}</code>
+            </pre>
+          </div>
+        </section>
 
-function verifyWebhook(payload, signature, secret) {
-  const expected = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex');
-  
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(\`sha256=\${expected}\`)
-  );
-}`}
-          language="javascript"
-          filename="verify.js"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Event Filtering</h2>
-        <p className="text-white/60 leading-relaxed">
-          You can filter which events are sent to each webhook endpoint using
-          the --events flag or by configuring filters in the webhook config.
-        </p>
-        <CodeBlock
-          code={`# Only receive error events
-conductor webhooks add https://example.com/errors \
-  --events tool.error,health.degraded
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">Event Types</h2>
+          <div className="space-y-2">
+            {[
+              {
+                event: "tool.call",
+                description: "A tool execution was initiated",
+              },
+              {
+                event: "tool.complete",
+                description: "A tool execution completed",
+              },
+              { event: "tool.error", description: "A tool execution failed" },
+              { event: "plugin.enabled", description: "A plugin was enabled" },
+              {
+                event: "plugin.disabled",
+                description: "A plugin was disabled",
+              },
+              {
+                event: "plugin.error",
+                description: "A plugin encountered an error",
+              },
+              {
+                event: "system.alert",
+                description: "A system-level alert was triggered",
+              },
+            ].map((item) => (
+              <div
+                key={item.event}
+                className="flex items-start gap-3 rounded-md border border-[#1a1a1a] bg-[#0a0a0a] p-3"
+              >
+                <code className="rounded bg-[#111] px-2 py-0.5 text-xs font-mono text-white">
+                  {item.event}
+                </code>
+                <span className="text-xs text-[#666]">{item.description}</span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-# Receive all events
-conductor webhooks add https://example.com/all \
-  --events '*'`}
-          language="bash"
-          filename="Terminal"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Retry Policy</h2>
-        <p className="text-white/60 leading-relaxed">
-          Failed webhook deliveries are retried with exponential backoff. After
-          5 failed attempts, the webhook is automatically disabled.
-        </p>
-        <CodeBlock
-          code={`{
-  "webhookRetry": {
-    "maxAttempts": 5,
-    "baseDelay": 1000,
-    "maxDelay": 300000,
-    "jitter": true
-  }
-}`}
-          language="json"
-          filename="webhook-retry.json"
-        />
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">Retry Logic</h2>
+          <p className="text-sm leading-relaxed text-[#888]">
+            Outgoing webhooks use exponential backoff with jitter for retries.
+            Failed deliveries are retried up to 5 times with increasing delays:
+            1s, 2s, 4s, 8s, 16s. After all retries are exhausted, the event is
+            logged to the dead letter queue.
+          </p>
+        </section>
+      </div>
+
+      <div className="mt-12 flex items-center gap-4 border-t border-[#1a1a1a] pt-8">
+        <Link
+          href="/docs/api-reference"
+          className="inline-flex items-center gap-2 text-sm text-[#888] transition-colors hover:text-white"
+        >
+          Next: API Reference
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </div>
   );

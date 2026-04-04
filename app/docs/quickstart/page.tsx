@@ -1,239 +1,142 @@
-import { CodeBlock } from "@/components/code-block";
-import {
-  ArrowRight,
-  CheckCircle2,
-  Terminal,
-  Download,
-  Settings,
-  MessageSquare,
-  Server,
-  Puzzle,
-} from "lucide-react";
 import Link from "next/link";
+import { ArrowRight, Copy, Terminal, Check } from "lucide-react";
+
+const steps = [
+  {
+    title: "Install Conductor",
+    code: "npm install -g @thealxlabs/conductor",
+    description:
+      "Install globally via npm, or use the install script for a standalone binary.",
+  },
+  {
+    title: "Initialize configuration",
+    code: "conductor config setup",
+    description:
+      "This creates ~/.conductor/config.json and sets up your database.",
+  },
+  {
+    title: "Enable plugins",
+    code: "conductor plugins enable filesystem shell git",
+    description:
+      "Enable the plugins you need. File system, shell, and git are recommended for getting started.",
+  },
+  {
+    title: "Start the MCP server",
+    code: "conductor mcp start",
+    description: "Starts the MCP server on stdio. Point your AI client to it.",
+  },
+];
+
+const mcpConfigs = [
+  {
+    client: "Claude Desktop",
+    path: "~/Library/Application Support/Claude/claude_desktop_config.json",
+    config: `{
+  "mcpServers": {
+    "conductor": {
+      "command": "npx",
+      "args": ["-y", "@thealxlabs/conductor"]
+    }
+  }
+}`,
+  },
+  {
+    client: "Cursor",
+    path: "Settings > Features > MCP Servers",
+    config: `{
+  "conductor": {
+    "command": "npx",
+    "args": ["-y", "@thealxlabs/conductor"]
+  }
+}`,
+  },
+  {
+    client: "Cline",
+    path: "Cline MCP Settings",
+    config: `{
+  "mcpServers": {
+    "conductor": {
+      "command": "npx",
+      "args": ["-y", "@thealxlabs/conductor"]
+    }
+  }
+}`,
+  },
+];
 
 export default function QuickStartPage() {
   return (
     <div>
       <div className="mb-12">
-        <div className="flex items-center gap-2 text-sm text-[#ff6b2b] mb-4">
-          <Terminal className="h-4 w-4" />
+        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
           Getting Started
-        </div>
-        <h1 className="text-4xl font-bold mb-4">Quick Start</h1>
-        <p className="text-lg text-white/50 max-w-2xl">
-          Get Conductor installed, configured, and connected to your AI client
-          in under 5 minutes.
+        </p>
+        <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
+          Quick Start
+        </h1>
+        <p className="mt-3 text-[#888]">
+          Get Conductor running in under 5 minutes.
         </p>
       </div>
 
-      <div className="prose prose-invert max-w-none">
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Prerequisites</h2>
-        <p className="text-white/60 leading-relaxed">
-          Before you begin, ensure you have the following installed on your
-          system:
-        </p>
-        <ul className="space-y-2 text-white/60">
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] shrink-0" /> Node.js
-            18 or later
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] shrink-0" /> npm,
-            yarn, or pnpm
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] shrink-0" /> An
-            MCP-compatible AI client (Claude Code, Cursor, Cline, etc.)
-          </li>
-        </ul>
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Step 1: Install Conductor
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          Install Conductor globally using your preferred package manager. This
-          gives you the{" "}
-          <code className="px-1.5 py-0.5 bg-white/5 rounded text-sm font-mono text-[#ff6b2b]">
-            conductor
-          </code>{" "}
-          CLI command.
-        </p>
-        <CodeBlock
-          code="npm install -g @thealxlabs/conductor"
-          language="bash"
-          filename="Terminal"
-        />
-        <p className="text-white/60 leading-relaxed mt-4">
-          Verify the installation by checking the version:
-        </p>
-        <CodeBlock
-          code="conductor --version"
-          language="bash"
-          filename="Terminal"
-        />
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Step 2: Initialize Configuration
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          Run the init command to create your configuration directory at{" "}
-          <code className="px-1.5 py-0.5 bg-white/5 rounded text-sm font-mono text-[#ff6b2b]">
-            ~/.conductor/
-          </code>
-          . This creates the config file, SQLite database, and encryption key.
-        </p>
-        <CodeBlock
-          code={`conductor init
-
-# This creates:
-# ~/.conductor/config.json    - Your configuration
-# ~/.conductor/conductor.db   - SQLite database
-# ~/.conductor/.key           - Encryption key`}
-          language="bash"
-          filename="Terminal"
-        />
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Step 3: Enable Plugins
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          Enable the plugins you need. Each plugin provides a set of tools that
-          your AI agent can use.
-        </p>
-        <CodeBlock
-          code={`# Enable essential plugins
-conductor plugins enable shell
-conductor plugins enable filesystem
-conductor plugins enable git
-conductor plugins enable github
-
-# List all enabled plugins
-conductor plugins list`}
-          language="bash"
-          filename="Terminal"
-        />
-        <p className="text-white/60 leading-relaxed mt-4">
-          You can also configure plugin-specific settings:
-        </p>
-        <CodeBlock
-          code={`# Configure GitHub plugin
-conductor config setup github
-
-# This will prompt you for:
-# - GitHub Personal Access Token
-# - Default repository
-# - Webhook URL (optional)`}
-          language="bash"
-          filename="Terminal"
-        />
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Step 4: Connect Your AI Client
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          Add the MCP server configuration to your AI client. Conductor uses
-          stdio transport by default.
-        </p>
-
-        <h3 className="text-xl font-semibold mt-8 mb-3">Claude Code</h3>
-        <CodeBlock
-          code={`# Add to your Claude Code MCP config
-{
-  "mcpServers": {
-    "conductor": {
-      "command": "conductor",
-      "args": ["mcp", "start"]
-    }
-  }
-}`}
-          language="json"
-          filename="claude_desktop_config.json"
-        />
-
-        <h3 className="text-xl font-semibold mt-8 mb-3">Cursor</h3>
-        <CodeBlock
-          code={`# In Cursor settings, add MCP server:
-{
-  "mcpServers": {
-    "conductor": {
-      "command": "npx",
-      "args": ["-y", "@thealxlabs/conductor", "mcp", "start"]
-    }
-  }
-}`}
-          language="json"
-          filename="Cursor MCP Config"
-        />
-
-        <h3 className="text-xl font-semibold mt-8 mb-3">Cline</h3>
-        <CodeBlock
-          code={`# In Cline settings, add MCP configuration:
-{
-  "mcpServers": {
-    "conductor": {
-      "command": "conductor",
-      "args": ["mcp", "start"]
-    }
-  }
-}`}
-          language="json"
-          filename="Cline MCP Config"
-        />
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Step 5: Verify Connection
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          Start the MCP server and verify it's working:
-        </p>
-        <CodeBlock
-          code={`# Start the MCP server
-conductor mcp start
-
-# Check health
-conductor doctor
-
-# Expected output:
-# ✓ Conductor is running
-# ✓ 4 plugins enabled
-# ✓ MCP server listening on stdio
-# ✓ Database connected
-# ✓ Encryption key loaded`}
-          language="bash"
-          filename="Terminal"
-        />
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">What's Next?</h2>
-        <div className="grid md:grid-cols-2 gap-4 mt-6">
-          <Link
-            href="/docs/mcp-server"
-            className="group flex items-start gap-3 p-4 rounded-xl border border-white/5 hover:border-[#ff6b2b]/20 hover:bg-[#ff6b2b]/5 transition-all"
-          >
-            <Server className="h-5 w-5 text-[#ff6b2b] mt-0.5 shrink-0" />
-            <div>
-              <div className="text-sm font-medium text-white/80 group-hover:text-white">
-                MCP Server
-              </div>
-              <div className="text-xs text-white/35 mt-1">
-                Learn how the MCP server works
-              </div>
+      <div className="space-y-12">
+        {steps.map((step, i) => (
+          <div key={i} className="group">
+            <div className="mb-3 flex items-center gap-3">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#1a1a1a] font-mono text-xs text-[#555]">
+                {i + 1}
+              </span>
+              <h2 className="font-mono text-lg font-semibold">{step.title}</h2>
             </div>
-          </Link>
-          <Link
-            href="/docs/plugins"
-            className="group flex items-start gap-3 p-4 rounded-xl border border-white/5 hover:border-[#ff6b2b]/20 hover:bg-[#ff6b2b]/5 transition-all"
-          >
-            <Puzzle className="h-5 w-5 text-[#ff6b2b] mt-0.5 shrink-0" />
-            <div>
-              <div className="text-sm font-medium text-white/80 group-hover:text-white">
-                Plugins
-              </div>
-              <div className="text-xs text-white/35 mt-1">
-                Explore the plugin system
-              </div>
+            <p className="mb-3 text-sm text-[#888]">{step.description}</p>
+            <div className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+              <pre className="p-4 text-sm font-mono text-[#ccc]">
+                <code>{step.code}</code>
+              </pre>
+              <button className="absolute top-2 right-2 rounded border border-[#222] bg-[#111] p-1.5 text-[#888] transition-colors hover:text-white">
+                <Copy className="h-3.5 w-3.5" />
+              </button>
             </div>
-          </Link>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-16 border-t border-[#1a1a1a] pt-12">
+        <h2 className="mb-6 font-mono text-xl font-semibold">
+          Configure your AI client
+        </h2>
+        <div className="space-y-4">
+          {mcpConfigs.map((cfg) => (
+            <div
+              key={cfg.client}
+              className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
+            >
+              <div className="border-b border-[#1a1a1a] px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-mono text-sm font-semibold">
+                      {cfg.client}
+                    </h3>
+                    <p className="text-xs text-[#555]">{cfg.path}</p>
+                  </div>
+                </div>
+              </div>
+              <pre className="p-4 text-sm font-mono text-[#ccc]">
+                <code>{cfg.config}</code>
+              </pre>
+            </div>
+          ))}
         </div>
+      </div>
+
+      <div className="mt-12 flex items-center gap-4">
+        <Link
+          href="/docs/mcp-server"
+          className="inline-flex items-center gap-2 text-sm text-[#888] transition-colors hover:text-white"
+        >
+          Next: MCP Server
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </div>
   );

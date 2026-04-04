@@ -1,55 +1,63 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { type ReactNode, useRef } from "react";
 
 interface MagneticDockProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
-  items: Array<{
-    icon: React.ReactNode;
-    label: string;
-    href?: string;
-    onClick?: () => void;
-  }>;
+  magnification?: number;
+  baseItemSize?: number;
 }
 
-export function MagneticDock({
-  children,
-  className,
-  items,
-}: MagneticDockProps) {
+interface DockItemProps {
+  children: ReactNode;
+  className?: string;
+}
+
+function DockItem({ children, className }: DockItemProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(Infinity);
+
+  const distance = useTransform(mouseX, (val) => {
+    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
+    return val - bounds.x - bounds.width / 2;
+  });
+
+  const widthSync = useTransform(distance, [-150, 0, 150], [40, 56, 40]);
+  const width = useSpring(widthSync, {
+    mass: 0.1,
+    stiffness: 150,
+    damping: 12,
+  });
+
   return (
     <motion.div
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
-      className={cn(
-        "fixed bottom-6 left-1/2 -translate-x-1/2 z-50",
-        "bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3",
-        "shadow-2xl shadow-black/50",
-        className,
-      )}
+      ref={ref}
+      style={{ width }}
+      className={cn("flex items-center justify-center", className)}
+      onMouseMove={(e) => mouseX.set(e.pageX)}
+      onMouseLeave={() => mouseX.set(Infinity)}
     >
-      <div className="flex items-center gap-2">
-        {items.map((item, i) => (
-          <motion.a
-            key={item.label}
-            href={item.href}
-            onClick={item.onClick}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.6 + i * 0.05 }}
-            whileHover={{ scale: 1.2, y: -4 }}
-            className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer"
-          >
-            <span className="text-white/70">{item.icon}</span>
-            <span className="text-[10px] text-white/50 whitespace-nowrap">
-              {item.label}
-            </span>
-          </motion.a>
-        ))}
-      </div>
+      {children}
     </motion.div>
   );
 }
+
+export function MagneticDock({ children, className = "" }: MagneticDockProps) {
+  return (
+    <div
+      className={cn(
+        "fixed bottom-6 left-1/2 -translate-x-1/2 z-50",
+        "flex items-end gap-1 px-3 py-2",
+        "rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]/80 backdrop-blur-xl",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+export { DockItem };

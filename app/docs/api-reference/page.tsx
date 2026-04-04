@@ -1,164 +1,176 @@
-import { CodeBlock } from "@/components/code-block";
-import {
-  Code2,
-  ArrowRight,
-  Server,
-  Database,
-  Puzzle,
-  Shield,
-  Activity,
-  Webhook,
-  Settings,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
-export default function APIReferencePage() {
+export default function ApiReferencePage() {
   return (
     <div>
       <div className="mb-12">
-        <div className="flex items-center gap-2 text-sm text-[#ff6b2b] mb-4">
-          <Code2 className="h-4 w-4" />
-          Integration
-        </div>
-        <h1 className="text-4xl font-bold mb-4">API Reference</h1>
-        <p className="text-lg text-white/50 max-w-2xl">
-          Complete reference for all Conductor API endpoints, data structures,
-          and MCP protocol messages.
+        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
+          Reference
+        </p>
+        <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
+          API Reference
+        </h1>
+        <p className="mt-3 text-[#888]">
+          Complete tool and endpoint reference.
         </p>
       </div>
-      <div className="prose prose-invert max-w-none">
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          MCP Protocol Endpoints
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          When running in HTTP transport mode, Conductor exposes these REST
-          endpoints:
-        </p>
-        <CodeBlock
-          code={`POST /mcp/tools/call
-  Body: { name: string, arguments: object }
-  Response: { result: string, isError: boolean }
 
-GET /mcp/tools/list
-  Response: { tools: ToolDefinition[] }
+      <div className="space-y-10">
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">MCP Tools</h2>
+          <p className="mb-4 text-sm text-[#888]">
+            Each plugin exposes tools via the MCP protocol. Tools are discovered
+            automatically by MCP-compatible clients.
+          </p>
+          <div className="space-y-3">
+            {[
+              {
+                tool: "filesystem.read",
+                desc: "Read file contents",
+                input: "{ path: string }",
+              },
+              {
+                tool: "filesystem.write",
+                desc: "Write file contents",
+                input: "{ path: string, content: string }",
+              },
+              {
+                tool: "filesystem.list",
+                desc: "List directory contents",
+                input: "{ path: string }",
+              },
+              {
+                tool: "filesystem.search",
+                desc: "Search files by pattern",
+                input: "{ path: string, pattern: string }",
+              },
+              {
+                tool: "shell.exec",
+                desc: "Execute a command",
+                input: "{ command: string, args?: string[] }",
+              },
+              {
+                tool: "git.status",
+                desc: "Get git repository status",
+                input: "{ path?: string }",
+              },
+              {
+                tool: "git.commit",
+                desc: "Create a git commit",
+                input: "{ message: string, files?: string[] }",
+              },
+              {
+                tool: "web.fetch",
+                desc: "Fetch a URL",
+                input: "{ url: string, format?: string }",
+              },
+              {
+                tool: "db.query",
+                desc: "Execute a database query",
+                input: "{ query: string, params?: unknown[] }",
+              },
+            ].map((item) => (
+              <div
+                key={item.tool}
+                className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
+              >
+                <div className="flex items-center justify-between">
+                  <code className="text-sm font-mono font-semibold text-white">
+                    {item.tool}
+                  </code>
+                  <span className="text-xs text-[#555]">{item.input}</span>
+                </div>
+                <p className="mt-1 text-xs text-[#666]">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-GET /mcp/health
-  Response: { status: string, plugins: number, uptime: number }
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            HTTP Endpoints
+          </h2>
+          <p className="mb-4 text-sm text-[#888]">
+            When running with HTTP transport, the following endpoints are
+            available:
+          </p>
+          <div className="space-y-2">
+            {[
+              { method: "GET", path: "/health", desc: "Health check" },
+              {
+                method: "GET",
+                path: "/metrics",
+                desc: "Prometheus-compatible metrics",
+              },
+              { method: "GET", path: "/audit", desc: "Audit log entries" },
+              {
+                method: "POST",
+                path: "/hooks/:name",
+                desc: "Incoming webhook endpoint",
+              },
+              {
+                method: "GET",
+                path: "/sse",
+                desc: "Server-sent events stream",
+              },
+            ].map((endpoint) => (
+              <div
+                key={endpoint.path}
+                className="flex items-center gap-3 rounded-md border border-[#1a1a1a] bg-[#0a0a0a] p-3"
+              >
+                <span
+                  className={`rounded px-2 py-0.5 text-xs font-mono font-semibold ${
+                    endpoint.method === "GET"
+                      ? "bg-[#111] text-[#888]"
+                      : "bg-[#222] text-white"
+                  }`}
+                >
+                  {endpoint.method}
+                </span>
+                <code className="text-sm font-mono">{endpoint.path}</code>
+                <span className="ml-auto text-xs text-[#555]">
+                  {endpoint.desc}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-GET /sse
-  Server-Sent Events stream for real-time updates`}
-          language="http"
-          filename="endpoints.http"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">CLI Commands</h2>
-        <CodeBlock
-          code={`# Lifecycle
-conductor start              # Start MCP server
-conductor stop               # Stop MCP server
-conductor status             # Check server status
-conductor restart            # Restart MCP server
-
-# Plugins
-conductor plugins list       # List all plugins
-conductor plugins enable <n> # Enable a plugin
-conductor plugins disable <n># Disable a plugin
-conductor plugins install <u># Install external plugin
-
-# Configuration
-conductor init               # Initialize configuration
-conductor config setup <p>   # Configure a plugin
-conductor config show        # Show current config
-
-# Diagnostics
-conductor doctor             # Run health checks
-conductor audit view         # View audit log
-conductor audit verify       # Verify audit integrity
-conductor metrics list       # List tool metrics`}
-          language="bash"
-          filename="cli-commands.sh"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Data Structures</h2>
-        <CodeBlock
-          code={`interface ToolDefinition {
-  name: string;
-  description: string;
-  inputSchema: {
-    type: "object";
-    properties: Record<string, JsonSchema>;
-    required?: string[];
-  };
-  requiresApproval?: boolean;
-}
-
-interface ToolCallRequest {
-  id: string;
-  jsonrpc: "2.0";
-  method: "tools/call";
-  params: {
-    name: string;
-    arguments: Record<string, unknown>;
-  };
-}
-
-interface ToolCallResponse {
-  id: string;
-  jsonrpc: "2.0";
-  result: {
-    content: Array<{
-      type: "text" | "image" | "resource";
-      text?: string;
-      data?: string;
-      mimeType?: string;
-    }>;
-    isError?: boolean;
-  };
-}`}
-          language="typescript"
-          filename="types.ts"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Error Codes</h2>
-        <CodeBlock
-          code={`// MCP error codes
-const ERROR_CODES = {
-  PARSE_ERROR:     -32700,  // Invalid JSON
-  INVALID_REQUEST: -32600,  // Invalid request format
-  METHOD_NOT_FOUND:-32601,  // Unknown method
-  INVALID_PARAMS:  -32602,  // Invalid parameters
-  INTERNAL_ERROR:  -32603,  // Internal server error
-  TOOL_NOT_FOUND:  -31001,  // Tool does not exist
-  APPROVAL_REQUIRED:-31002, // User approval needed
-  CIRCUIT_OPEN:    -31003,  // Circuit breaker is open
-  RATE_LIMITED:    -31004,  // Rate limit exceeded
-  PLUGIN_ERROR:    -31005,  // Plugin execution failed
-}`}
-          language="typescript"
-          filename="error-codes.ts"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Response Format</h2>
-        <CodeBlock
-          code={`// Success response
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Response Format
+          </h2>
+          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+            <pre className="p-4 text-xs font-mono text-[#ccc]">
+              <code>{`// MCP tool response
 {
-  "jsonrpc": "2.0",
-  "id": "req_123",
-  "result": {
-    "content": [
-      { "type": "text", "text": "Command executed successfully" }
-    ]
-  }
+  "content": [
+    { "type": "text", "text": "Result here" }
+  ],
+  "isError": false
 }
 
 // Error response
 {
-  "jsonrpc": "2.0",
-  "id": "req_123",
-  "error": {
-    "code": -31002,
-    "message": "Approval required for this tool",
-    "data": { "tool": "shell", "command": "rm -rf /" }
-  }
-}`}
-          language="json"
-          filename="responses.json"
-        />
+  "content": [
+    { "type": "text", "text": "Error message" }
+  ],
+  "isError": true
+}`}</code>
+            </pre>
+          </div>
+        </section>
+      </div>
+
+      <div className="mt-12 flex items-center gap-4 border-t border-[#1a1a1a] pt-8">
+        <Link
+          href="/docs/sdks"
+          className="inline-flex items-center gap-2 text-sm text-[#888] transition-colors hover:text-white"
+        >
+          Next: SDKs
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </div>
   );

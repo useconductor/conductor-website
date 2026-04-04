@@ -1,26 +1,26 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "Conductor — One connection. Every tool.",
   description:
-    "The universal MCP plugin system for AI agents. Connect Claude, Cursor, Cline, and every AI client to 100+ tools with a single configuration.",
-  keywords: ["MCP", "AI", "Claude", "Cursor", "plugins", "AI agents"],
-  authors: [{ name: "TheAlxLabs" }],
+    "The single MCP server that gives any AI agent access to 100+ tools. Connect Claude Code, Cursor, Cline, and more to your entire system.",
+  keywords: ["MCP", "AI", "Claude", "Cursor", "Cline", "tools", "plugins"],
   openGraph: {
     title: "Conductor — One connection. Every tool.",
-    description: "The universal MCP plugin system for AI agents.",
+    description:
+      "The single MCP server that gives any AI agent access to 100+ tools.",
     type: "website",
-    url: "https://conductor.thealxlabs.com",
-    siteName: "Conductor",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Conductor — One connection. Every tool.",
-    description: "The universal MCP plugin system for AI agents.",
   },
 };
 
@@ -31,7 +31,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={`${inter.variable} ${ibmPlexMono.variable} bg-[#050505] font-sans text-white antialiased`}
+      >
+        <Navbar />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }

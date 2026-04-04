@@ -1,68 +1,92 @@
-import { CodeBlock } from "@/components/code-block";
-import {
-  FileQuestion,
-  ArrowRight,
-  Shield,
-  Puzzle,
-  Server,
-  Zap,
-} from "lucide-react";
+"use client";
 
-export default function FAQPage() {
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+const faqs = [
+  {
+    q: "What is Conductor?",
+    a: "Conductor is an MCP (Model Context Protocol) server that exposes a plugin system as tools to AI agents. It gives any MCP-compatible AI client access to 100+ tools including file system operations, shell execution, git, databases, webhooks, and more.",
+  },
+  {
+    q: "Which AI clients are supported?",
+    a: "Any MCP-compatible client works with Conductor. This includes Claude Code, Cursor, Cline, Aider, Windsurf, Continue, Roo Code, GitHub Copilot, and any other client that supports the MCP protocol.",
+  },
+  {
+    q: "Is Conductor secure?",
+    a: "Yes. Conductor uses AES-256-GCM encryption for secrets, command whitelisting for shell operations, approval gates for dangerous tools, circuit breakers for fault tolerance, and SHA-256 chained audit logging for tamper-evident records.",
+  },
+  {
+    q: "Where is my data stored?",
+    a: "All state lives under ~/.conductor/: config.json for settings, conductor.db (SQLite) for conversation history, audit.log for tamper-evident audit records, and plugins/ for external plugin files. Secrets are stored in the OS keychain.",
+  },
+  {
+    q: "How do I write a custom plugin?",
+    a: "Create a .js file that exports a default class implementing the Plugin interface. Drop it into ~/.conductor/plugins/ and enable it with conductor plugins enable <name>. See the Plugins documentation for the full interface specification.",
+  },
+  {
+    q: "Can I run Conductor on a remote server?",
+    a: "Yes. Start Conductor with HTTP transport (conductor mcp start --transport http) and configure your AI clients to connect to the remote endpoint. The dashboard and webhook endpoints also work over HTTP.",
+  },
+  {
+    q: "What happens when a tool fails?",
+    a: "Each tool has an independent circuit breaker. After repeated failures, the circuit opens and requests fail fast. Conductor also retries with exponential backoff before opening the circuit. All failures are logged to the audit log.",
+  },
+  {
+    q: "Is Conductor open source?",
+    a: "Yes. The core Conductor project is open source and available on GitHub. External plugins can be shared through the marketplace.",
+  },
+  {
+    q: "How do webhooks work?",
+    a: "Conductor supports both incoming and outgoing webhooks. Incoming webhooks let external systems trigger actions. Outgoing webhooks send events (tool calls, plugin changes, system alerts) to external URLs with retry logic and signature verification.",
+  },
+  {
+    q: "Can I use Conductor with Ollama or local models?",
+    a: "Yes. The AI Manager plugin supports multiple providers including Claude, OpenAI, Gemini, and Ollama. Configure your preferred provider with conductor config setup ai-manager.",
+  },
+];
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="border-b border-[#1a1a1a]">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between py-5 text-left"
+      >
+        <span className="font-mono text-sm font-medium">{question}</span>
+        {open ? (
+          <ChevronUp className="h-4 w-4 shrink-0 text-[#555]" />
+        ) : (
+          <ChevronDown className="h-4 w-4 shrink-0 text-[#555]" />
+        )}
+      </button>
+      {open && (
+        <p className="pb-5 text-sm leading-relaxed text-[#888]">{answer}</p>
+      )}
+    </div>
+  );
+}
+
+export default function FaqPage() {
   return (
     <div>
       <div className="mb-12">
-        <div className="flex items-center gap-2 text-sm text-[#ff6b2b] mb-4">
-          <FileQuestion className="h-4 w-4" />
+        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
           Resources
-        </div>
-        <h1 className="text-4xl font-bold mb-4">FAQ</h1>
-        <p className="text-lg text-white/50 max-w-2xl">
+        </p>
+        <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
+          FAQ
+        </h1>
+        <p className="mt-3 text-[#888]">
           Frequently asked questions about Conductor.
         </p>
       </div>
-      <div className="prose prose-invert max-w-none space-y-6">
-        {[
-          {
-            q: "What is Conductor?",
-            a: "Conductor is a universal MCP (Model Context Protocol) plugin system for AI agents. It acts as a bridge between AI clients like Claude Code, Cursor, and Cline, and 100+ tools including shell commands, GitHub, Slack, AWS, and more.",
-          },
-          {
-            q: "Which AI clients are supported?",
-            a: "Any MCP-compatible client works with Conductor. This includes Claude Code, Cursor, Cline, Aider, Windsurf, Continue, Roo Code, GitHub Copilot, and any other client that supports the MCP stdio or HTTP transport.",
-          },
-          {
-            q: "Is Conductor free?",
-            a: "Yes, Conductor is open source and released under the MIT License. You can use it for personal and commercial projects without any cost.",
-          },
-          {
-            q: "How does Conductor handle security?",
-            a: "Conductor uses AES-256-GCM encryption for secrets, stores them in the OS keychain, implements circuit breakers per tool, requires approval for dangerous operations, and maintains a tamper-evident audit log.",
-          },
-          {
-            q: "Can I build custom plugins?",
-            a: "Yes. Use conductor plugin-create to scaffold a new plugin. Custom plugins are JavaScript files that implement the standard Plugin interface. They can be placed in ~/.conductor/plugins/.",
-          },
-          {
-            q: "Where is data stored?",
-            a: "All state lives in ~/.conductor/: config.json for settings, conductor.db (SQLite) for history, audit.log for tamper-evident logging, .key for the encryption key, and plugins/ for external plugins.",
-          },
-          {
-            q: "How do I update Conductor?",
-            a: "Run npm update -g @thealxlabs/conductor to get the latest version. Check the migration guide for breaking changes between major versions.",
-          },
-          {
-            q: "Can I run Conductor on a server?",
-            a: "Yes. Use conductor mcp start --transport http --port 3000 to run as an HTTP server. You can then connect remote AI clients to it.",
-          },
-        ].map((faq) => (
-          <div
-            key={faq.q}
-            className="p-5 rounded-xl border border-white/5 bg-[#0a0a0a]"
-          >
-            <h3 className="text-base font-semibold mb-2">{faq.q}</h3>
-            <p className="text-sm text-white/50 leading-relaxed">{faq.a}</p>
-          </div>
+
+      <div>
+        {faqs.map((faq) => (
+          <FaqItem key={faq.q} question={faq.q} answer={faq.a} />
         ))}
       </div>
     </div>

@@ -1,120 +1,93 @@
-import { CodeBlock } from "@/components/code-block";
-import {
-  BookMarked,
-  ArrowRight,
-  Terminal,
-  Settings,
-  Puzzle,
-  Cloud,
-  Server,
-  Shield,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, BookOpen, Terminal, Settings, Cloud } from "lucide-react";
+
+const guides = [
+  {
+    icon: Terminal,
+    title: "Setting up your first MCP client",
+    description:
+      "Step-by-step guide to connecting Claude Code, Cursor, or any MCP client to Conductor.",
+    href: "/docs/guides/first-client",
+    tag: "Beginner",
+  },
+  {
+    icon: Settings,
+    title: "Custom plugin development",
+    description:
+      "Build your own plugin with the Plugin interface, config schema, and tool definitions.",
+    href: "/docs/guides/custom-plugins",
+    tag: "Advanced",
+  },
+  {
+    icon: Cloud,
+    title: "Deploying Conductor on a server",
+    description:
+      "Run Conductor as a remote MCP server with HTTP transport for team access.",
+    href: "/docs/guides/remote-deployment",
+    tag: "Intermediate",
+  },
+  {
+    icon: BookOpen,
+    title: "Webhook integrations",
+    description:
+      "Connect GitHub, Slack, and other services to trigger Conductor automations.",
+    href: "/docs/guides/webhook-integrations",
+    tag: "Intermediate",
+  },
+  {
+    icon: Terminal,
+    title: "Shell plugin configuration",
+    description:
+      "Configure the command allowlist, approval gates, and sandbox settings.",
+    href: "/docs/guides/shell-config",
+    tag: "Intermediate",
+  },
+  {
+    icon: Settings,
+    title: "Database plugin setup",
+    description: "Connect to PostgreSQL, SQLite, MySQL, and other databases.",
+    href: "/docs/guides/database-setup",
+    tag: "Beginner",
+  },
+];
 
 export default function GuidesPage() {
   return (
     <div>
       <div className="mb-12">
-        <div className="flex items-center gap-2 text-sm text-[#ff6b2b] mb-4">
-          <BookMarked className="h-4 w-4" />
+        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
           Resources
-        </div>
-        <h1 className="text-4xl font-bold mb-4">Guides</h1>
-        <p className="text-lg text-white/50 max-w-2xl">
-          Step-by-step guides for common tasks, workflows, and integrations with
-          Conductor.
+        </p>
+        <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
+          Guides
+        </h1>
+        <p className="mt-3 text-[#888]">
+          Step-by-step tutorials and walkthroughs.
         </p>
       </div>
-      <div className="prose prose-invert max-w-none">
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Getting Started Guides
-        </h2>
-        <div className="space-y-4">
-          {[
-            {
-              title: "Set up Conductor with Claude Code",
-              desc: "Connect Conductor to Claude Code for full tool access",
-              level: "Beginner",
-            },
-            {
-              title: "Set up Conductor with Cursor",
-              desc: "Configure Cursor to use Conductor as an MCP server",
-              level: "Beginner",
-            },
-            {
-              title: "Set up Conductor with Cline",
-              desc: "Enable Cline to access 100+ tools through Conductor",
-              level: "Beginner",
-            },
-            {
-              title: "Set up Conductor with Aider",
-              desc: "Configure Aider to use Conductor for tool access",
-              level: "Beginner",
-            },
-          ].map((guide) => (
-            <div
-              key={guide.title}
-              className="p-4 rounded-xl border border-white/5 bg-[#0a0a0a] hover:border-[#ff6b2b]/20 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-semibold">{guide.title}</h3>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500/70">
-                  {guide.level}
+
+      <div className="space-y-3">
+        {guides.map((guide) => (
+          <Link
+            key={guide.href}
+            href={guide.href}
+            className="group flex items-start gap-4 rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5 transition-colors hover:border-[#333]"
+          >
+            <guide.icon className="mt-0.5 h-5 w-5 text-[#555]" />
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-mono text-sm font-semibold">
+                  {guide.title}
+                </h3>
+                <span className="rounded-full border border-[#1a1a1a] px-2 py-0.5 text-[10px] text-[#555]">
+                  {guide.tag}
                 </span>
               </div>
-              <p className="text-xs text-white/40">{guide.desc}</p>
+              <p className="mt-1 text-xs text-[#666]">{guide.description}</p>
             </div>
-          ))}
-        </div>
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Integration Guides
-        </h2>
-        <div className="space-y-4">
-          {[
-            {
-              title: "Connect to GitHub",
-              desc: "Configure the GitHub plugin for PR and issue management",
-            },
-            {
-              title: "Connect to Slack",
-              desc: "Set up Slack integration for team notifications",
-            },
-            {
-              title: "Connect to AWS",
-              desc: "Configure AWS credentials and service access",
-            },
-            {
-              title: "Connect to Jira",
-              desc: "Set up Jira integration for issue tracking",
-            },
-          ].map((guide) => (
-            <div
-              key={guide.title}
-              className="p-4 rounded-xl border border-white/5 bg-[#0a0a0a] hover:border-[#ff6b2b]/20 transition-colors"
-            >
-              <h3 className="text-sm font-semibold mb-1">{guide.title}</h3>
-              <p className="text-xs text-white/40">{guide.desc}</p>
-            </div>
-          ))}
-        </div>
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Advanced Guides</h2>
-        <CodeBlock
-          code={`# Build a custom plugin
-conductor plugin-create my-plugin
-
-# Deploy Conductor as a service
-sudo systemctl enable conductor
-sudo systemctl start conductor
-
-# Set up monitoring with webhooks
-conductor webhooks add https://hooks.slack.com/services/xxx \\
-  --events tool.error,health.degraded
-
-# Configure backup for audit logs
-conductor audit export --format json \\
-  --output /backup/audit-$(date +%Y%m%d).json`}
-          language="bash"
-          filename="advanced.sh"
-        />
+            <ArrowRight className="mt-0.5 h-4 w-4 text-[#333] transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        ))}
       </div>
     </div>
   );

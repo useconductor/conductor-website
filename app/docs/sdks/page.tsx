@@ -1,119 +1,130 @@
-import { CodeBlock } from "@/components/code-block";
-import { Cpu, ArrowRight, Code2, Terminal, Package } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Code2, Terminal, Globe } from "lucide-react";
 
-export default function SDKsPage() {
+export default function SdksPage() {
   return (
     <div>
       <div className="mb-12">
-        <div className="flex items-center gap-2 text-sm text-[#ff6b2b] mb-4">
-          <Cpu className="h-4 w-4" />
-          Integration
-        </div>
-        <h1 className="text-4xl font-bold mb-4">SDKs</h1>
-        <p className="text-lg text-white/50 max-w-2xl">
-          Official SDKs for integrating with Conductor programmatically.
-          Available for TypeScript, Python, and more.
+        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
+          Reference
+        </p>
+        <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
+          SDKs
+        </h1>
+        <p className="mt-3 text-[#888]">
+          Client libraries for integrating with Conductor programmatically.
         </p>
       </div>
-      <div className="prose prose-invert max-w-none">
-        <h2 className="text-2xl font-semibold mt-12 mb-4">TypeScript SDK</h2>
-        <CodeBlock
-          code={`import { ConductorClient } from '@thealxlabs/conductor-sdk';
+
+      <div className="space-y-10">
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Available SDKs
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
+              <div className="mb-3 flex items-center gap-2">
+                <Code2 className="h-4 w-4 text-[#555]" />
+                <h3 className="font-mono text-sm font-semibold">TypeScript</h3>
+              </div>
+              <code className="rounded bg-[#111] px-2 py-1 text-xs font-mono text-[#888]">
+                npm i @conductor/sdk
+              </code>
+              <p className="mt-3 text-xs text-[#666]">
+                Full type support, MCP client utilities, and plugin helpers.
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
+              <div className="mb-3 flex items-center gap-2">
+                <Terminal className="h-4 w-4 text-[#555]" />
+                <h3 className="font-mono text-sm font-semibold">Python</h3>
+              </div>
+              <code className="rounded bg-[#111] px-2 py-1 text-xs font-mono text-[#888]">
+                pip install conductor-sdk
+              </code>
+              <p className="mt-3 text-xs text-[#666]">
+                Async client with webhook handling and event streaming.
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
+              <div className="mb-3 flex items-center gap-2">
+                <Globe className="h-4 w-4 text-[#555]" />
+                <h3 className="font-mono text-sm font-semibold">REST API</h3>
+              </div>
+              <code className="rounded bg-[#111] px-2 py-1 text-xs font-mono text-[#888]">
+                HTTP/JSON
+              </code>
+              <p className="mt-3 text-xs text-[#666]">
+                Use any HTTP client. OpenAPI spec available at /openapi.json.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            TypeScript Example
+          </h2>
+          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+            <pre className="p-4 text-xs font-mono text-[#ccc]">
+              <code>{`import { ConductorClient } from "@conductor/sdk";
 
 const client = new ConductorClient({
-  transport: 'http',
-  baseUrl: 'http://localhost:3000',
+  transport: "stdio",
+  command: "npx",
+  args: ["-y", "@thealxlabs/conductor"],
 });
+
+await client.connect();
+
+// Call a tool directly
+const result = await client.callTool("filesystem.read", {
+  path: "./package.json",
+});
+
+console.log(result.content[0].text);
 
 // List available tools
-const tools = await client.tools.list();
+const tools = await client.listTools();
+console.log(tools.map(t => t.name));
 
-// Call a tool
-const result = await client.tools.call('shell', {
-  command: 'ls -la',
-  workingDir: '/home/user',
-});
+await client.disconnect();`}</code>
+            </pre>
+          </div>
+        </section>
 
-// Get metrics
-const metrics = await client.metrics.get('shell');
-
-// Subscribe to events
-client.on('tool.complete', (event) => {
-  console.log('Tool completed:', event.data.tool);
-});`}
-          language="typescript"
-          filename="sdk-typescript.ts"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Python SDK</h2>
-        <CodeBlock
-          code={`from conductor_sdk import ConductorClient
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Python Example
+          </h2>
+          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+            <pre className="p-4 text-xs font-mono text-[#ccc]">
+              <code>{`from conductor import ConductorClient
 
 client = ConductorClient(
     transport="http",
-    base_url="http://localhost:3000",
+    base_url="http://localhost:3000"
 )
 
-# List available tools
-tools = client.tools.list()
+async with client:
+    result = await client.call_tool(
+        "filesystem.read",
+        path="./package.json"
+    )
+    print(result.content[0].text)`}</code>
+            </pre>
+          </div>
+        </section>
+      </div>
 
-# Call a tool
-result = client.tools.call("shell", {
-    "command": "ls -la",
-    "workingDir": "/home/user",
-})
-
-# Get metrics
-metrics = client.metrics.get("shell")
-
-# Subscribe to events
-@client.on("tool.complete")
-def on_tool_complete(event):
-    print(f"Tool completed: {event.data.tool}")`}
-          language="python"
-          filename="sdk-python.py"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Installation</h2>
-        <CodeBlock
-          code={`# TypeScript / JavaScript
-npm install @thealxlabs/conductor-sdk
-
-# Python
-pip install conductor-sdk
-
-# Go
-go get github.com/thealxlabs/conductor-sdk/go
-
-# Rust
-cargo add conductor-sdk`}
-          language="bash"
-          filename="Terminal"
-        />
-        <h2 className="text-2xl font-semibold mt-12 mb-4">SDK Features</h2>
-        <div className="grid md:grid-cols-2 gap-4 my-6">
-          {[
-            {
-              title: "Type Safety",
-              desc: "Full TypeScript types for all API responses",
-            },
-            {
-              title: "Auto Retry",
-              desc: "Built-in retry logic matching server config",
-            },
-            {
-              title: "Event Streaming",
-              desc: "SSE client for real-time event subscriptions",
-            },
-            { title: "Health Checks", desc: "Programmatic health monitoring" },
-          ].map((feature) => (
-            <div
-              key={feature.title}
-              className="p-4 rounded-xl border border-white/5 bg-[#0a0a0a]"
-            >
-              <h3 className="text-sm font-semibold mb-1">{feature.title}</h3>
-              <p className="text-xs text-white/40">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
+      <div className="mt-12 flex items-center gap-4 border-t border-[#1a1a1a] pt-8">
+        <Link
+          href="/docs/guides"
+          className="inline-flex items-center gap-2 text-sm text-[#888] transition-colors hover:text-white"
+        >
+          Next: Guides
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </div>
   );

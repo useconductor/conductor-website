@@ -1,243 +1,140 @@
-import { CodeBlock } from "@/components/code-block";
-import {
-  Shield,
-  Lock,
-  KeyRound,
-  ShieldCheck,
-  Eye,
-  FileCheck,
-  AlertTriangle,
-  CheckCircle2,
-  XCircle,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Shield, Lock, FileCheck, Eye, Key } from "lucide-react";
 
 export default function SecurityPage() {
   return (
     <div>
       <div className="mb-12">
-        <div className="flex items-center gap-2 text-sm text-[#ff6b2b] mb-4">
-          <Shield className="h-4 w-4" />
-          Integration
-        </div>
-        <h1 className="text-4xl font-bold mb-4">Security</h1>
-        <p className="text-lg text-white/50 max-w-2xl">
-          Conductor is built with security as a first-class concern. Every layer
-          of the stack includes protections against misuse, data leaks, and
-          unauthorized access.
+        <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
+          Core
+        </p>
+        <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
+          Security
+        </h1>
+        <p className="mt-3 text-[#888]">
+          Encryption, approval gates, and audit logging.
         </p>
       </div>
 
-      <div className="prose prose-invert max-w-none">
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Security Model Overview
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          Conductor follows a defense-in-depth strategy with multiple layers of
-          security controls. No single point of failure can compromise the
-          system.
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-4 my-8">
-          <div className="p-5 rounded-xl border border-white/5 bg-[#0a0a0a]">
-            <div className="flex items-center gap-2 mb-3">
-              <Lock className="h-4 w-4 text-[#ff6b2b]" />
-              <h3 className="text-sm font-semibold">Encryption at Rest</h3>
+      <div className="space-y-10">
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Security Model
+          </h2>
+          <p className="mb-6 text-sm leading-relaxed text-[#888]">
+            Conductor is designed with a defense-in-depth approach. Every layer
+            has security controls, and no single point of failure compromises
+            the system.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
+              <Lock className="mb-3 h-5 w-5 text-[#555]" />
+              <h3 className="mb-2 font-mono text-sm font-semibold">
+                AES-256-GCM Encryption
+              </h3>
+              <p className="text-xs leading-relaxed text-[#666]">
+                Secrets are encrypted at rest using AES-256-GCM. The encryption
+                key is derived from the machine ID and stored in the OS
+                keychain.
+              </p>
             </div>
-            <p className="text-xs text-white/40 leading-relaxed">
-              All secrets are encrypted with AES-256-GCM. The encryption key is
-              derived from the machine ID and stored in the OS keychain.
-            </p>
-          </div>
-          <div className="p-5 rounded-xl border border-white/5 bg-[#0a0a0a]">
-            <div className="flex items-center gap-2 mb-3">
-              <ShieldCheck className="h-4 w-4 text-[#ff6b2b]" />
-              <h3 className="text-sm font-semibold">Approval Gates</h3>
+            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
+              <Shield className="mb-3 h-5 w-5 text-[#555]" />
+              <h3 className="mb-2 font-mono text-sm font-semibold">
+                Command Whitelisting
+              </h3>
+              <p className="text-xs leading-relaxed text-[#666]">
+                The shell plugin uses a strict allowlist. No eval() or exec().
+                Only explicitly permitted commands can be executed.
+              </p>
             </div>
-            <p className="text-xs text-white/40 leading-relaxed">
-              Dangerous tools require explicit user approval before execution.
-              The shell plugin uses a strict allowlist — no eval() or exec().
-            </p>
-          </div>
-          <div className="p-5 rounded-xl border border-white/5 bg-[#0a0a0a]">
-            <div className="flex items-center gap-2 mb-3">
-              <Eye className="h-4 w-4 text-[#ff6b2b]" />
-              <h3 className="text-sm font-semibold">Audit Logging</h3>
+            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
+              <FileCheck className="mb-3 h-5 w-5 text-[#555]" />
+              <h3 className="mb-2 font-mono text-sm font-semibold">
+                Approval Gates
+              </h3>
+              <p className="text-xs leading-relaxed text-[#666]">
+                Dangerous tools set requiresApproval: true. The user must
+                explicitly approve before execution proceeds.
+              </p>
             </div>
-            <p className="text-xs text-white/40 leading-relaxed">
-              Tamper-evident audit chain with SHA-256 hashing. Every tool call
-              is logged and chained to the previous entry.
-            </p>
-          </div>
-          <div className="p-5 rounded-xl border border-white/5 bg-[#0a0a0a]">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="h-4 w-4 text-[#ff6b2b]" />
-              <h3 className="text-sm font-semibold">Circuit Breakers</h3>
+            <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-5">
+              <Eye className="mb-3 h-5 w-5 text-[#555]" />
+              <h3 className="mb-2 font-mono text-sm font-semibold">
+                Audit Logging
+              </h3>
+              <p className="text-xs leading-relaxed text-[#666]">
+                SHA-256 chained append-only log at ~/.conductor/audit.log.
+                Tamper-evident — any modification breaks the chain.
+              </p>
             </div>
-            <p className="text-xs text-white/40 leading-relaxed">
-              Per-tool circuit breakers prevent cascading failures and protect
-              against runaway tool calls.
-            </p>
           </div>
-        </div>
+        </section>
 
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Secret Management</h2>
-        <p className="text-white/60 leading-relaxed">
-          Secrets (API keys, tokens, passwords) are never stored in plain text.
-          Conductor uses a multi-layered approach:
-        </p>
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Secret Management
+          </h2>
+          <p className="mb-4 text-sm leading-relaxed text-[#888]">
+            Secrets (API keys, tokens, passwords) are never stored in
+            config.json. Instead, they are:
+          </p>
+          <ol className="list-inside space-y-2 text-sm text-[#888]">
+            <li className="flex items-start gap-2">
+              <span className="mt-1 font-mono text-xs text-[#555]">1.</span>
+              Marked with secret: true in the plugin configSchema
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1 font-mono text-xs text-[#555]">2.</span>
+              Encrypted with AES-256-GCM using a machine-bound key
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1 font-mono text-xs text-[#555]">3.</span>
+              Stored in the OS keychain (macOS Keychain, Windows Credential
+              Manager, Linux libsecret)
+            </li>
+          </ol>
+        </section>
 
-        <CodeBlock
-          code={`// Secret fields in config schema
-{
-  key: "api_key",
-  label: "API Key", 
-  type: "string",
-  secret: true,  // Automatically encrypted
-  required: true,
-}
-
-// Secrets are stored in:
-// - OS Keychain (macOS Keychain, Windows Credential Manager, Linux libsecret)
-// - Encrypted with AES-256-GCM
-// - Key derived from machine-specific identifier`}
-          language="json"
-          filename="secret-config.json"
-        />
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Shell Plugin Security
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          The shell plugin is the most security-sensitive component. It uses a
-          strict allowlist approach:
-        </p>
-
-        <div className="my-6">
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-            <span className="text-sm text-green-500 font-medium">
-              Allowed by default
-            </span>
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Circuit Breaker
+          </h2>
+          <p className="mb-4 text-sm leading-relaxed text-[#888]">
+            Each tool has an independent circuit breaker that opens after
+            repeated failures, preventing cascading errors and resource
+            exhaustion.
+          </p>
+          <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+            <pre className="p-4 text-xs font-mono text-[#ccc]">
+              <code>{`// Circuit breaker states
+CLOSED   → Normal operation, requests pass through
+OPEN     → All requests fail fast (no execution)
+HALF_OPEN → Testing if service recovered`}</code>
+            </pre>
           </div>
-          <div className="grid md:grid-cols-2 gap-2 mb-6">
-            {[
-              "ls",
-              "cat",
-              "grep",
-              "find",
-              "git",
-              "npm",
-              "node",
-              "curl",
-              "wget",
-              "mkdir",
-              "cp",
-              "mv",
-            ].map((cmd) => (
-              <code
-                key={cmd}
-                className="text-xs px-2 py-1 rounded bg-green-500/10 text-green-500/80 font-mono"
-              >
-                {cmd}
-              </code>
-            ))}
-          </div>
+        </section>
 
-          <div className="flex items-center gap-2 mb-3">
-            <XCircle className="h-4 w-4 text-red-500" />
-            <span className="text-sm text-red-500 font-medium">
-              Requires approval
-            </span>
-          </div>
-          <div className="grid md:grid-cols-2 gap-2">
-            {[
-              "rm",
-              "chmod",
-              "chown",
-              "sudo",
-              "kill",
-              "dd",
-              "mkfs",
-              "shutdown",
-            ].map((cmd) => (
-              <code
-                key={cmd}
-                className="text-xs px-2 py-1 rounded bg-red-500/10 text-red-500/80 font-mono"
-              >
-                {cmd}
-              </code>
-            ))}
-          </div>
-        </div>
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Rate Limiting
+          </h2>
+          <p className="text-sm leading-relaxed text-[#888]">
+            All HTTP endpoints are protected by express-rate-limit. The
+            dashboard and webhook endpoints have independent rate limit
+            configurations.
+          </p>
+        </section>
+      </div>
 
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Audit Log Verification
-        </h2>
-        <p className="text-white/60 leading-relaxed">
-          The audit log is a chained, append-only file. Each entry includes the
-          SHA-256 hash of the previous entry, making tampering detectable.
-        </p>
-
-        <CodeBlock
-          code={`// Verify audit log integrity
-conductor audit verify
-
-// Output:
-// ✓ Audit log verified: 1,247 entries
-// ✓ Chain integrity: VALID
-// ✓ No tampering detected
-// Last entry hash: a3f2b8c9...`}
-          language="bash"
-          filename="Terminal"
-        />
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">Rate Limiting</h2>
-        <p className="text-white/60 leading-relaxed">
-          All HTTP endpoints are protected by rate limiting to prevent abuse:
-        </p>
-
-        <CodeBlock
-          code={`// Rate limiting configuration
-{
-  "rateLimit": {
-    "windowMs": 60000,     // 1 minute window
-    "maxRequests": 100,     // Max 100 requests per window
-    "message": "Too many requests, please try again later"
-  }
-}`}
-          language="json"
-          filename="rate-limit.json"
-        />
-
-        <h2 className="text-2xl font-semibold mt-12 mb-4">
-          Security Best Practices
-        </h2>
-        <ul className="space-y-3 text-white/60">
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] mt-0.5 shrink-0" />{" "}
-            Keep Conductor updated to the latest version
-          </li>
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] mt-0.5 shrink-0" />{" "}
-            Use the minimum set of plugins needed for your workflow
-          </li>
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] mt-0.5 shrink-0" />{" "}
-            Enable approval gates for all destructive operations
-          </li>
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] mt-0.5 shrink-0" />{" "}
-            Regularly review the audit log for unusual activity
-          </li>
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] mt-0.5 shrink-0" />{" "}
-            Rotate API keys and tokens periodically
-          </li>
-          <li className="flex items-start gap-2">
-            <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] mt-0.5 shrink-0" />{" "}
-            Never share your ~/.conductor/.key file
-          </li>
-        </ul>
+      <div className="mt-12 flex items-center gap-4 border-t border-[#1a1a1a] pt-8">
+        <Link
+          href="/docs/webhooks"
+          className="inline-flex items-center gap-2 text-sm text-[#888] transition-colors hover:text-white"
+        >
+          Next: Webhooks
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </div>
   );

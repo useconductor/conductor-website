@@ -2,72 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import {
-  BookOpen,
-  Rocket,
-  Server,
-  Puzzle,
-  Shield,
-  Webhook,
-  Code2,
-  BookMarked,
-  Cpu,
-  FileQuestion,
-  Network,
-  ListChecks,
-  AlertTriangle,
-  ArrowLeftRight,
-  CheckCircle2,
-} from "lucide-react";
 
 const docsNav = [
   {
     section: "Getting Started",
-    items: [
-      { href: "/docs", label: "Overview", icon: BookOpen },
-      { href: "/docs/quickstart", label: "Quick Start", icon: Rocket },
-      { href: "/docs/install", label: "Installation", icon: Code2 },
+    links: [
+      { href: "/docs", label: "Overview" },
+      { href: "/docs/quickstart", label: "Quick Start" },
+      { href: "/docs/install", label: "Installation" },
     ],
   },
   {
-    section: "Core Concepts",
-    items: [
-      { href: "/docs/mcp-server", label: "MCP Server", icon: Server },
-      { href: "/docs/mcp-protocol", label: "MCP Protocol", icon: Network },
-      { href: "/docs/plugins", label: "Plugins", icon: Puzzle },
-      {
-        href: "/docs/plugin-reference",
-        label: "Plugin Reference",
-        icon: ListChecks,
-      },
+    section: "Core",
+    links: [
+      { href: "/docs/mcp-server", label: "MCP Server" },
+      { href: "/docs/plugins", label: "Plugins" },
+      { href: "/docs/security", label: "Security" },
+      { href: "/docs/webhooks", label: "Webhooks" },
     ],
   },
   {
-    section: "Integration",
-    items: [
-      { href: "/docs/webhooks", label: "Webhooks", icon: Webhook },
-      { href: "/docs/security", label: "Security", icon: Shield },
-      { href: "/docs/api-reference", label: "API Reference", icon: Code2 },
-      { href: "/docs/sdks", label: "SDKs", icon: Cpu },
+    section: "Reference",
+    links: [
+      { href: "/docs/api-reference", label: "API Reference" },
+      { href: "/docs/sdks", label: "SDKs" },
     ],
   },
   {
     section: "Resources",
-    items: [
-      { href: "/docs/guides", label: "Guides", icon: BookMarked },
-      {
-        href: "/docs/best-practices",
-        label: "Best Practices",
-        icon: CheckCircle2,
-      },
-      { href: "/docs/migration", label: "Migration", icon: ArrowLeftRight },
-      {
-        href: "/docs/troubleshooting",
-        label: "Troubleshooting",
-        icon: AlertTriangle,
-      },
-      { href: "/docs/faq", label: "FAQ", icon: FileQuestion },
+    links: [
+      { href: "/docs/guides", label: "Guides" },
+      { href: "/docs/faq", label: "FAQ" },
     ],
   },
 ];
@@ -76,39 +41,30 @@ export function DocsSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 shrink-0 border-r border-white/5 bg-[#080808]">
-      <div className="sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto py-6 px-4">
-        <div className="mb-4 px-2">
-          <Link
-            href="/docs"
-            className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
-          >
-            <BookOpen className="h-4 w-4" />
-            Documentation
-          </Link>
-        </div>
-
+    <aside
+      className="sticky top-14 hidden w-56 shrink-0 border-r border-[#1a1a1a] px-6 py-8 md:block"
+      style={{ height: "calc(100vh - 3.5rem)" }}
+    >
+      <nav className="space-y-6">
         {docsNav.map((group) => (
-          <div key={group.section} className="mb-6">
-            <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider px-2 mb-2">
+          <div key={group.section}>
+            <p className="mb-2 text-xs font-mono uppercase tracking-widest text-[#555]">
               {group.section}
-            </h3>
-            <ul className="space-y-0.5">
-              {group.items.map((item) => {
-                const isActive = pathname === item.href;
+            </p>
+            <ul className="space-y-1">
+              {group.links.map((link) => {
+                const active = pathname === link.href;
                 return (
-                  <li key={item.href}>
+                  <li key={link.href}>
                     <Link
-                      href={item.href}
-                      className={cn(
-                        "flex items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-all",
-                        isActive
-                          ? "bg-[#ff6b2b]/10 text-[#ff6b2b] font-medium"
-                          : "text-white/50 hover:text-white/80 hover:bg-white/5",
-                      )}
+                      href={link.href}
+                      className={`block rounded-md px-2 py-1.5 text-sm transition-colors ${
+                        active
+                          ? "bg-[#111] font-medium text-white"
+                          : "text-[#888] hover:text-white"
+                      }`}
                     >
-                      <item.icon className="h-3.5 w-3.5 shrink-0" />
-                      {item.label}
+                      {link.label}
                     </Link>
                   </li>
                 );
@@ -116,7 +72,7 @@ export function DocsSidebar() {
             </ul>
           </div>
         ))}
-      </div>
+      </nav>
     </aside>
   );
 }

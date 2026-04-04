@@ -1,281 +1,154 @@
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
-import { CodeBlock } from "@/components/code-block";
-import { NoiseTexture } from "@/components/ui/noise-texture";
-import { BorderBeam } from "@/components/ui/border-beam";
-import { SpotlightCard } from "@/components/ui/spotlight-card";
 import {
   Terminal,
-  Download,
-  Apple,
-  Monitor,
-  CheckCircle2,
-  ArrowRight,
   Copy,
+  Check,
+  ArrowRight,
+  Download,
   Shield,
   Zap,
-  Server,
-  Package,
-  Globe,
-  Cpu,
 } from "lucide-react";
 import Link from "next/link";
 
-function Penguin({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 2a8 8 0 0 0-8 8v2a2 2 0 0 0-2 2v2h20v-2a2 2 0 0 0-2-2v-2a8 8 0 0 0-8-8z" />
-      <circle cx="9" cy="10" r="1" fill="currentColor" />
-      <circle cx="15" cy="10" r="1" fill="currentColor" />
-      <path d="M8 16h8v4H8z" />
-    </svg>
-  );
-}
-
 const installMethods = [
   {
-    icon: Terminal,
-    title: "npm (Recommended)",
+    title: "npm (recommended)",
     description:
       "Install globally via npm. Works on all platforms with Node.js 18+.",
     command: "npm install -g @thealxlabs/conductor",
-    language: "bash",
+    icon: Terminal,
   },
   {
-    icon: Package,
-    title: "npx (No Install)",
-    description:
-      "Run without installing. Useful for trying Conductor before committing.",
-    command: "npx @thealxlabs/conductor --help",
-    language: "bash",
+    title: "npx (no install)",
+    description: "Run without installing. Useful for trying Conductor quickly.",
+    command: "npx @thealxlabs/conductor",
+    icon: Zap,
   },
   {
-    icon: Cpu,
-    title: "Homebrew (macOS)",
-    description:
-      "Install via Homebrew for automatic updates and system integration.",
-    command: "brew install thealxlabs/tap/conductor",
-    language: "bash",
+    title: "Install script",
+    description: "Standalone binary installation. No Node.js required.",
+    command: "curl -fsSL https://conductor.dev/install.sh | sh",
+    icon: Download,
   },
 ];
 
-const osInstructions = [
-  {
-    icon: Apple,
-    os: "macOS",
-    steps: [
-      "Install Node.js via brew: brew install node",
-      "Install Conductor: npm install -g @thealxlabs/conductor",
-      "Initialize: conductor init",
-      "Verify: conductor doctor",
-    ],
-  },
-  {
-    icon: Penguin,
-    os: "Linux",
-    steps: [
-      "Install Node.js via your package manager",
-      "Install Conductor: npm install -g @thealxlabs/conductor",
-      "Initialize: conductor init",
-      "Verify: conductor doctor",
-    ],
-  },
-  {
-    icon: Monitor,
-    os: "Windows",
-    steps: [
-      "Install Node.js from nodejs.org",
-      "Install Conductor: npm install -g @thealxlabs/conductor",
-      "Initialize: conductor init",
-      "Verify: conductor doctor",
-    ],
-  },
+const requirements = [
+  "Node.js 18 or later (for npm/npx installation)",
+  "macOS, Linux, or Windows",
+  "At least 256MB RAM",
+  "SQLite3 (bundled with sql.js, no system dependency)",
 ];
 
 export default function InstallPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
-      <Navbar />
-      <div className="pt-16">
-        {/* Hero */}
-        <section className="relative py-24 overflow-hidden">
-          <NoiseTexture opacity={0.02} />
-          <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#ff6b2b]/20 bg-[#ff6b2b]/5 mb-8">
-              <Download className="h-3.5 w-3.5 text-[#ff6b2b]" />
-              <span className="text-sm text-[#ff6b2b] font-medium">
-                Install in seconds
-              </span>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              Get <span className="text-gradient">Conductor</span>
-            </h1>
-            <p className="text-lg text-white/50 max-w-2xl mx-auto mb-12">
-              One command to install. One command to connect. Your AI agent will
-              have access to 100+ tools.
-            </p>
-            <CodeBlock
-              code="npm install -g @thealxlabs/conductor"
-              language="bash"
-              filename="Terminal"
-              className="max-w-xl mx-auto"
-            />
-          </div>
-        </section>
+    <div className="min-h-screen px-6 pt-24 pb-20">
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-12">
+          <p className="mb-3 text-xs font-mono uppercase tracking-widest text-[#555]">
+            Getting Started
+          </p>
+          <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
+            Install
+          </h1>
+          <p className="mt-3 text-[#888]">
+            Get Conductor running on your machine.
+          </p>
+        </div>
 
-        {/* Install Methods */}
-        <section className="max-w-7xl mx-auto px-6 py-16">
-          <h2 className="text-2xl font-bold mb-8">Installation Methods</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {installMethods.map((method) => (
-              <SpotlightCard key={method.title} className="p-6">
-                <BorderBeam size={120} duration={12} />
-                <div className="relative z-10">
-                  <div className="w-10 h-10 rounded-lg bg-[#ff6b2b]/10 flex items-center justify-center mb-4">
-                    <method.icon className="h-5 w-5 text-[#ff6b2b]" />
-                  </div>
-                  <h3 className="text-base font-semibold mb-2">
-                    {method.title}
-                  </h3>
-                  <p className="text-sm text-white/40 mb-4">
-                    {method.description}
-                  </p>
-                  <CodeBlock code={method.command} language={method.language} />
-                </div>
-              </SpotlightCard>
-            ))}
-          </div>
-        </section>
-
-        {/* OS Instructions */}
-        <section className="border-t border-white/5 bg-[#080808]">
-          <div className="max-w-7xl mx-auto px-6 py-16">
-            <h2 className="text-2xl font-bold mb-8">Platform Guides</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {osInstructions.map((os) => (
-                <div
-                  key={os.os}
-                  className="p-6 rounded-xl border border-white/5 bg-[#0a0a0a]"
+        <div className="space-y-8">
+          <section>
+            <h2 className="mb-4 font-mono text-xl font-semibold">
+              Requirements
+            </h2>
+            <ul className="space-y-2">
+              {requirements.map((req) => (
+                <li
+                  key={req}
+                  className="flex items-start gap-2 text-sm text-[#888]"
                 >
-                  <div className="flex items-center gap-3 mb-4">
-                    <os.icon className="h-5 w-5 text-[#ff6b2b]" />
-                    <h3 className="text-base font-semibold">{os.os}</h3>
+                  <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#555]" />
+                  {req}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="mb-4 font-mono text-xl font-semibold">
+              Installation Methods
+            </h2>
+            <div className="space-y-4">
+              {installMethods.map((method) => (
+                <div
+                  key={method.title}
+                  className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
+                >
+                  <div className="border-b border-[#1a1a1a] px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <method.icon className="h-5 w-5 text-[#555]" />
+                      <div>
+                        <h3 className="font-mono text-sm font-semibold">
+                          {method.title}
+                        </h3>
+                        <p className="text-xs text-[#666]">
+                          {method.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <ol className="space-y-3">
-                    {os.steps.map((step, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-2 text-sm text-white/50"
-                      >
-                        <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] mt-0.5 shrink-0" />
-                        {step}
-                      </li>
-                    ))}
-                  </ol>
+                  <div className="flex items-center justify-between p-4">
+                    <code className="text-sm font-mono text-[#ccc]">
+                      {method.command}
+                    </code>
+                    <button className="shrink-0 rounded border border-[#222] bg-[#111] p-2 text-[#888] transition-colors hover:text-white">
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Requirements */}
-        <section className="max-w-7xl mx-auto px-6 py-16">
-          <h2 className="text-2xl font-bold mb-8">Requirements</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 rounded-xl border border-white/5 bg-[#0a0a0a]">
-              <h3 className="text-base font-semibold mb-4">
-                System Requirements
-              </h3>
-              <ul className="space-y-2">
-                {[
-                  "Node.js 18 or later",
-                  "npm, yarn, or pnpm",
-                  "2GB RAM minimum",
-                  "50MB disk space",
-                  "Internet connection for plugin downloads",
-                ].map((req) => (
-                  <li
-                    key={req}
-                    className="flex items-center gap-2 text-sm text-white/50"
-                  >
-                    <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] shrink-0" />
-                    {req}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="p-6 rounded-xl border border-white/5 bg-[#0a0a0a]">
-              <h3 className="text-base font-semibold mb-4">
-                Supported AI Clients
-              </h3>
-              <ul className="space-y-2">
-                {[
-                  "Claude Code",
-                  "Cursor",
-                  "Cline",
-                  "Aider",
-                  "Windsurf",
-                  "Continue",
-                  "Roo Code",
-                  "GitHub Copilot",
-                ].map((client) => (
-                  <li
-                    key={client}
-                    className="flex items-center gap-2 text-sm text-white/50"
-                  >
-                    <CheckCircle2 className="h-4 w-4 text-[#ff6b2b] shrink-0" />
-                    {client}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
+          <section>
+            <h2 className="mb-4 font-mono text-xl font-semibold">
+              Verify Installation
+            </h2>
+            <div className="overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+              <pre className="p-4 text-sm font-mono text-[#ccc]">
+                <code>{`conductor --version
+# conductor 2.0.0
 
-        {/* Next Steps */}
-        <section className="border-t border-white/5 bg-[#080808]">
-          <div className="max-w-7xl mx-auto px-6 py-16">
-            <h2 className="text-2xl font-bold mb-8">Next Steps</h2>
-            <div className="grid md:grid-cols-3 gap-6">
+conductor doctor
+# Checking system...
+# Node.js: v20.11.0 ✓
+# SQLite: available ✓
+# Config: ~/.conductor/config.json ✓
+# Database: ~/.conductor/conductor.db ✓
+# All systems operational.`}</code>
+              </pre>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="mb-4 font-mono text-xl font-semibold">Next Steps</h2>
+            <div className="flex flex-wrap gap-3">
               <Link
                 href="/docs/quickstart"
-                className="group p-6 rounded-xl border border-white/5 bg-[#0a0a0a] hover:border-[#ff6b2b]/20 transition-all"
+                className="inline-flex items-center gap-2 rounded-md border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2 text-sm text-[#888] transition-colors hover:text-white"
               >
-                <Zap className="h-5 w-5 text-[#ff6b2b] mb-3" />
-                <h3 className="text-sm font-semibold mb-1">Quick Start</h3>
-                <p className="text-xs text-white/40">
-                  Get connected in 5 minutes
-                </p>
+                Quick Start Guide
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
               <Link
-                href="/docs"
-                className="group p-6 rounded-xl border border-white/5 bg-[#0a0a0a] hover:border-[#ff6b2b]/20 transition-all"
+                href="/docs/mcp-server"
+                className="inline-flex items-center gap-2 rounded-md border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2 text-sm text-[#888] transition-colors hover:text-white"
               >
-                <Server className="h-5 w-5 text-[#ff6b2b] mb-3" />
-                <h3 className="text-sm font-semibold mb-1">Documentation</h3>
-                <p className="text-xs text-white/40">Read the full docs</p>
-              </Link>
-              <Link
-                href="/marketplace"
-                className="group p-6 rounded-xl border border-white/5 bg-[#0a0a0a] hover:border-[#ff6b2b]/20 transition-all"
-              >
-                <Globe className="h-5 w-5 text-[#ff6b2b] mb-3" />
-                <h3 className="text-sm font-semibold mb-1">Marketplace</h3>
-                <p className="text-xs text-white/40">Browse 100+ plugins</p>
+                MCP Server Docs
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
-      <Footer />
     </div>
   );
 }

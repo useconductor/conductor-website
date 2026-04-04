@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface BorderBeamProps {
@@ -15,13 +14,13 @@ interface BorderBeamProps {
 }
 
 export function BorderBeam({
-  className,
+  className = "",
   size = 200,
   duration = 15,
   anchor = 90,
   borderWidth = 1.5,
-  colorFrom = "#ff6b2b",
-  colorTo = "#ff9a5c",
+  colorFrom = "#ffffff",
+  colorTo = "#444444",
   delay = 0,
 }: BorderBeamProps) {
   return (
@@ -39,18 +38,10 @@ export function BorderBeam({
       }
       className={cn(
         "pointer-events-none absolute inset-0 rounded-[inherit] [border:calc(var(--border-width)*1px)_solid_transparent]",
-        "[mask-image:radial-gradient(400px_circle_at_center,black,transparent)]",
-        "[mask-composite:intersect]",
-        "[mask-clip:padding-box,border-box]",
-        "after:absolute after:inset-0 after:aspect-square after:[background:conic-gradient(from_calc(var(--anchor)*1deg),transparent_0%,var(--color-from)_70%,var(--color-to)_100%)]",
-        "after:[animation-duration:var(--duration)]",
-        "after:[animation-delay:var(--delay)]",
-        "after:[animation-timing-function:linear]",
-        "after:[animation-fill-mode:forwards]",
-        "after:[mask:radial-gradient(400px_circle_at_center,white,_black)]",
-        "after:[mask-composite:exclude]",
-        "after:[mask-clip:padding-box,border-box]",
-        "after:animate-border-beam",
+        "[mask-image:linear-gradient(transparent,transparent),linear-gradient(#000_0_0)]",
+        "[mask-composite:intersect] [mask-clip:padding-box,border-box]",
+        "after:absolute after:aspect-square after:w-[calc(var(--size)*1px)] after:animate-border-beam after:[animation-delay:var(--delay)]",
+        "after:[background:linear-gradient(to_left,var(--color-from),var(--color-to),transparent)] after:[offset-anchor:calc(var(--anchor)*1%)_50%] after:[offset-path:rect(0_auto_auto_0_round_calc(var(--size)*1px))]",
         className,
       )}
     />

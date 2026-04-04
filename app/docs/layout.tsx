@@ -1,6 +1,4 @@
 import { DocsSidebar } from "@/components/docs-sidebar";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 
 export default function DocsLayout({
   children,
@@ -8,15 +6,11 @@ export default function DocsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
-      <Navbar />
-      <div className="flex pt-16">
-        <DocsSidebar />
-        <main className="flex-1 min-w-0">
-          <div className="max-w-4xl mx-auto px-8 py-12">{children}</div>
-        </main>
+    <div className="flex">
+      <DocsSidebar />
+      <div className="min-w-0 flex-1 px-6 py-8 md:px-12 md:py-12">
+        <div className="mx-auto max-w-3xl">{children}</div>
       </div>
-      <Footer />
     </div>
   );
 }

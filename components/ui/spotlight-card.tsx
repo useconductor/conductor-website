@@ -1,16 +1,10 @@
 "use client";
 
-import {
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  type MotionValue,
-} from "framer-motion";
-import { useCallback, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useRef, useState, type ReactNode } from "react";
 
 interface SpotlightCardProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   spotlightColor?: string;
 }
@@ -18,52 +12,35 @@ interface SpotlightCardProps {
 export function SpotlightCard({
   children,
   className = "",
-  spotlightColor = "rgba(255, 107, 43, 0.15)",
+  spotlightColor = "rgba(255, 255, 255, 0.15)",
 }: SpotlightCardProps) {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const divRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (containerRef.current) {
-        const { left, top } = containerRef.current.getBoundingClientRect();
-        mouseX.set(e.clientX - left);
-        mouseY.set(e.clientY - top);
-      }
-    },
-    [mouseX, mouseY],
-  );
-
-  const handleMouseLeave = useCallback(() => {
-    mouseX.set(-1000);
-    mouseY.set(-1000);
-  }, [mouseX, mouseY]);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.addEventListener("mousemove", handleMouseMove);
-    el.addEventListener("mouseleave", handleMouseLeave);
-    return () => {
-      el.removeEventListener("mousemove", handleMouseMove);
-      el.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  }, [handleMouseMove, handleMouseLeave]);
-
-  const background = useMotionTemplate`radial-gradient(350px circle at ${mouseX}px ${mouseY}px, ${spotlightColor}, transparent 80%)`;
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!divRef.current) return;
+    const rect = divRef.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
 
   return (
     <div
-      ref={containerRef}
+      ref={divRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setOpacity(1)}
+      onMouseLeave={() => setOpacity(0)}
       className={cn(
-        "group relative rounded-xl border border-white/10 bg-[#0a0a0a] overflow-hidden",
+        "relative rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] overflow-hidden",
         className,
       )}
     >
-      <motion.div
-        className="pointer-events-none absolute inset-0"
-        style={{ background }}
+      <div
+        className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+        style={{
+          opacity,
+          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 40%)`,
+        }}
       />
       <div className="relative z-10">{children}</div>
     </div>

@@ -1,22 +1,19 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { cn } from "@/lib/utils";
 
 interface MatrixRainProps {
-  className?: string;
-  fontSize?: number;
+  color?: string;
   speed?: number;
   opacity?: number;
-  color?: string;
+  className?: string;
 }
 
 export function MatrixRain({
-  className,
-  fontSize = 14,
-  speed = 30,
+  color = "#ffffff",
+  speed = 0.5,
   opacity = 0.15,
-  color = "#ff6b2b",
+  className = "",
 }: MatrixRainProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -27,6 +24,7 @@ export function MatrixRain({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    let animationId: number;
     const resize = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
@@ -34,13 +32,16 @@ export function MatrixRain({
     resize();
     window.addEventListener("resize", resize);
 
-    const chars =
-      "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+    const katakana =
+      "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+    const binary = "01";
+    const chars = katakana + binary;
+    const fontSize = 14;
     const columns = Math.floor(canvas.width / fontSize);
     const drops: number[] = Array(columns).fill(1);
 
     const draw = () => {
-      ctx.fillStyle = `rgba(0, 0, 0, 0.05)`;
+      ctx.fillStyle = `rgba(5, 5, 5, ${0.05 / speed})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = color;
       ctx.globalAlpha = opacity;
@@ -56,20 +57,22 @@ export function MatrixRain({
         drops[i]++;
       }
       ctx.globalAlpha = 1;
+      animationId = requestAnimationFrame(draw);
     };
 
-    const interval = setInterval(draw, speed);
+    draw();
 
     return () => {
-      clearInterval(interval);
+      cancelAnimationFrame(animationId);
       window.removeEventListener("resize", resize);
     };
-  }, [fontSize, speed, opacity, color]);
+  }, [color, speed, opacity]);
 
   return (
     <canvas
       ref={canvasRef}
-      className={cn("absolute inset-0 w-full h-full", className)}
+      className={`pointer-events-none absolute inset-0 ${className}`}
+      style={{ zIndex: 0 }}
     />
   );
 }

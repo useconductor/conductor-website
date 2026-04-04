@@ -1,92 +1,25 @@
-@import "tailwindcss";
-
-@theme {
-  --color-background: hsl(0 0% 3%);
-  --color-foreground: hsl(0 0% 98%);
-  --color-card: hsl(0 0% 6%);
-  --color-card-foreground: hsl(0 0% 98%);
-  --color-popover: hsl(0 0% 6%);
-  --color-popover-foreground: hsl(0 0% 98%);
-  --color-primary: hsl(18 100% 58%);
-  --color-primary-foreground: hsl(0 0% 100%);
-  --color-secondary: hsl(0 0% 9%);
-  --color-secondary-foreground: hsl(0 0% 98%);
-  --color-muted: hsl(0 0% 9%);
-  --color-muted-foreground: hsl(0 0% 55%);
-  --color-accent: hsl(18 100% 58%);
-  --color-accent-foreground: hsl(0 0% 100%);
-  --color-destructive: hsl(0 84% 60%);
-  --color-destructive-foreground: hsl(0 0% 98%);
-  --color-border: hsl(0 0% 12%);
-  --color-input: hsl(0 0% 12%);
-  --color-ring: hsl(18 100% 58%);
-  --radius: 0.75rem;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
-  * {
-    border-color: hsl(0 0% 12%);
-  }
+  * { border-color: #1a1a1a; }
   body {
-    background-color: hsl(0 0% 3%);
-    color: hsl(0 0% 98%);
+    background: #050505;
+    color: #fff;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
   .text-gradient {
-    background: linear-gradient(to right, #ff6b2b, #ff9a5c);
+    background: linear-gradient(to right, #fff, #888);
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .glow-orange {
-    box-shadow: 0 0 40px rgba(255, 107, 43, 0.15);
-  }
 }
 
-@keyframes border-beam {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-border-beam {
-  animation: border-beam var(--duration, 15s) linear infinite;
-  animation-delay: var(--delay, 0s);
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #0a0a0a;
-}
-::-webkit-scrollbar-thumb {
-  background: #222;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #333;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-::selection {
-  background: rgba(255, 107, 43, 0.3);
-  color: #fff;
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #050505; }
+::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
+::selection { background: rgba(255,255,255,0.15); color: #fff; }
