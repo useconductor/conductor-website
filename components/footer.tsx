@@ -34,7 +34,7 @@ const columns = [
     links: [
       {
         label: "GitHub",
-        href: "https://github.com/thealxlabs/conductor",
+        href: "https://github.com/useconductor/conductor",
         external: true,
       },
       {
@@ -71,7 +71,7 @@ export function Footer() {
             </p>
             <div className="mt-4 flex items-center gap-3">
               <a
-                href="https://github.com/thealxlabs/conductor"
+                href="https://github.com/useconductor/conductor"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#333] transition-colors hover:text-white"

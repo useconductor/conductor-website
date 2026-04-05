@@ -11,7 +11,7 @@ const clientConfigs: {
   {
     client: "Claude Code (CLI)",
     path: "one command",
-    config: "claude mcp add conductor -- npx -y @thealxlabs/conductor",
+    config: "claude mcp add conductor -- npx -y @useconductor/conductor",
     note: "This is the fastest path. Run it once, then restart Claude Code.",
   },
   {
@@ -21,7 +21,7 @@ const clientConfigs: {
   "mcpServers": {
     "conductor": {
       "command": "npx",
-      "args": ["-y", "@thealxlabs/conductor"]
+      "args": ["-y", "@useconductor/conductor"]
     }
   }
 }`,
@@ -34,7 +34,7 @@ const clientConfigs: {
   "mcpServers": {
     "conductor": {
       "command": "npx",
-      "args": ["-y", "@thealxlabs/conductor"]
+      "args": ["-y", "@useconductor/conductor"]
     }
   }
 }`,
@@ -46,7 +46,7 @@ const clientConfigs: {
   "mcpServers": {
     "conductor": {
       "command": "npx",
-      "args": ["-y", "@thealxlabs/conductor"]
+      "args": ["-y", "@useconductor/conductor"]
     }
   }
 }`,
@@ -58,7 +58,7 @@ const clientConfigs: {
   "mcpServers": {
     "conductor": {
       "command": "npx",
-      "args": ["-y", "@thealxlabs/conductor"]
+      "args": ["-y", "@useconductor/conductor"]
     }
   }
 }`,
@@ -71,7 +71,7 @@ const clientConfigs: {
     {
       "name": "conductor",
       "command": "npx",
-      "args": ["-y", "@thealxlabs/conductor"]
+      "args": ["-y", "@useconductor/conductor"]
     }
   ]
 }`,
@@ -125,9 +125,9 @@ export default function QuickStartPage() {
           </p>
           <div className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#080808]">
             <pre className="p-4 pr-12 font-mono text-sm text-[#aaa]">
-              <code>npm install -g @thealxlabs/conductor</code>
+              <code>npm install -g @useconductor/conductor</code>
             </pre>
-            <CopyButton text="npm install -g @thealxlabs/conductor" className="absolute right-3 top-2.5" />
+            <CopyButton text="npm install -g @useconductor/conductor" className="absolute right-3 top-2.5" />
           </div>
           <p className="mt-3 text-xs text-[#555]">
             No Node.js? Use the{" "}
@@ -208,7 +208,7 @@ export default function QuickStartPage() {
               },
               {
                 problem: "\"command not found: conductor\"",
-                fix: 'Use the npx form in your config instead: "command": "npx", "args": ["-y", "@thealxlabs/conductor"]. This works without a global install.',
+                fix: 'Use the npx form in your config instead: "command": "npx", "args": ["-y", "@useconductor/conductor"]. This works without a global install.',
               },
               {
                 problem: "Shell commands are rejected",

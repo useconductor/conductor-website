@@ -7,7 +7,7 @@ const tsExample = `import { ConductorClient } from "@conductor/sdk";
 const client = new ConductorClient({
   transport: "stdio",
   command: "npx",
-  args: ["-y", "@thealxlabs/conductor"],
+  args: ["-y", "@useconductor/conductor"],
 });
 
 await client.connect();

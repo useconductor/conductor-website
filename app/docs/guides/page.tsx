@@ -54,19 +54,19 @@ const guides = [
 ];
 
 const firstClientGuide = {
-  claudeCode: `claude mcp add conductor -- npx -y @thealxlabs/conductor`,
+  claudeCode: `claude mcp add conductor -- npx -y @useconductor/conductor`,
   claudeDesktop: `{
   "mcpServers": {
     "conductor": {
       "command": "npx",
-      "args": ["-y", "@thealxlabs/conductor"]
+      "args": ["-y", "@useconductor/conductor"]
     }
   }
 }`,
   cursor: `{
   "conductor": {
     "command": "npx",
-    "args": ["-y", "@thealxlabs/conductor"]
+    "args": ["-y", "@useconductor/conductor"]
   }
 }`,
 };

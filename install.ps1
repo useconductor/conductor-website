@@ -154,7 +154,7 @@ if (Test-Path "package.json") {
 
 if (-not (Test-Path "$ConductorDir\package.json")) {
     Info "Cloning from GitHub..."
-    git clone --quiet https://github.com/thealxlabs/conductor.git $ConductorDir
+    git clone --quiet https://github.com/useconductor/conductor.git $ConductorDir
     if ($LASTEXITCODE -ne 0) { Fail "Clone failed. Check your internet connection." }
 }
 

@@ -10,32 +10,51 @@ const docsNav = [
       { href: "/docs", label: "Overview" },
       { href: "/docs/quickstart", label: "Quick Start" },
       { href: "/docs/install", label: "Installation" },
+      { href: "/docs/concepts", label: "How it works" },
     ],
   },
   {
     section: "Core",
     links: [
-      { href: "/docs/mcp-server", label: "MCP Server" },
-      { href: "/docs/plugins", label: "Plugin System" },
-      { href: "/docs/zero-config", label: "Zero-Config Plugins" },
+      { href: "/docs/mcp-server", label: "Configuration" },
+      { href: "/docs/transport", label: "Transport modes" },
+      { href: "/docs/plugins", label: "Plugin system" },
+      { href: "/docs/zero-config", label: "Zero-config plugins" },
       { href: "/docs/security", label: "Security" },
+      { href: "/docs/audit-logs", label: "Audit logs" },
+      { href: "/docs/circuit-breakers", label: "Circuit breakers" },
       { href: "/docs/webhooks", label: "Webhooks" },
+    ],
+  },
+  {
+    section: "Deployment",
+    links: [
+      { href: "/docs/deployment", label: "Deployment guide" },
+      { href: "/docs/ci-cd", label: "CI/CD" },
+    ],
+  },
+  {
+    section: "Guides",
+    links: [
+      { href: "/docs/custom-plugins", label: "Writing plugins" },
+      { href: "/docs/guides", label: "More guides" },
     ],
   },
   {
     section: "Reference",
     links: [
-      { href: "/docs/cli", label: "CLI Reference" },
-      { href: "/docs/mcp-compatibility", label: "MCP Compatibility" },
-      { href: "/docs/api-reference", label: "API Reference" },
+      { href: "/docs/cli", label: "CLI reference" },
+      { href: "/docs/api-reference", label: "API reference" },
       { href: "/docs/sdks", label: "SDKs" },
+      { href: "/docs/mcp-compatibility", label: "MCP compatibility" },
     ],
   },
   {
     section: "Resources",
     links: [
-      { href: "/docs/guides", label: "Guides" },
       { href: "/docs/faq", label: "FAQ" },
+      { href: "/docs/troubleshooting", label: "Troubleshooting" },
+      { href: "/docs/changelog", label: "Changelog" },
     ],
   },
 ];
@@ -45,26 +64,26 @@ export function DocsSidebar() {
 
   return (
     <aside
-      className="sticky top-14 hidden w-56 shrink-0 border-r border-[#1a1a1a] px-6 py-8 md:block"
+      className="sticky top-14 hidden w-56 shrink-0 overflow-y-auto border-r border-[#1a1a1a] px-6 py-8 md:block"
       style={{ height: "calc(100vh - 3.5rem)" }}
     >
       <nav className="space-y-6">
         {docsNav.map((group) => (
           <div key={group.section}>
-            <p className="mb-2 text-xs font-mono uppercase tracking-widest text-[#555]">
+            <p className="mb-2 text-xs font-mono uppercase tracking-widest text-[#333]">
               {group.section}
             </p>
-            <ul className="space-y-1">
+            <ul className="space-y-0.5">
               {group.links.map((link) => {
                 const active = pathname === link.href;
                 return (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`block rounded-md px-2 py-1.5 text-sm transition-colors ${
+                      className={`block rounded px-2 py-1.5 text-sm transition-colors ${
                         active
                           ? "bg-[#111] font-medium text-white"
-                          : "text-[#888] hover:text-white"
+                          : "text-[#666] hover:text-white"
                       }`}
                     >
                       {link.label}

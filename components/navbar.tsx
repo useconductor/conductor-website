@@ -66,7 +66,7 @@ export function Navbar() {
         {/* Desktop actions */}
         <div className="hidden items-center gap-3 md:flex">
           <a
-            href="https://github.com/thealxlabs/conductor"
+            href="https://github.com/useconductor/conductor"
             target="_blank"
             rel="noopener noreferrer"
             className="text-[#555] transition-colors hover:text-white"
@@ -108,7 +108,7 @@ export function Navbar() {
               </Link>
             ))}
             <a
-              href="https://github.com/thealxlabs/conductor"
+              href="https://github.com/useconductor/conductor"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-[#777] transition-colors hover:text-white"

@@ -73,7 +73,7 @@ const features = [
     title: "100+ Plugins",
     description:
       "File system, shell, git, databases, APIs, webhooks — every tool your AI agent needs, all bundled and maintained.",
-    detail: "npm install -g @thealxlabs/conductor",
+    detail: "npm install -g @useconductor/conductor",
   },
   {
     icon: Shield,
@@ -168,7 +168,7 @@ const mcpConfig = `{
   "mcpServers": {
     "conductor": {
       "command": "npx",
-      "args": ["-y", "@thealxlabs/conductor"]
+      "args": ["-y", "@useconductor/conductor"]
     }
   }
 }`;
@@ -592,9 +592,9 @@ export default function HomePage() {
             <div className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#060606]">
               <BorderBeam size={150} duration={10} />
               <pre className="p-4 pr-12 font-mono text-sm text-[#777]">
-                <code>npm install -g @thealxlabs/conductor</code>
+                <code>npm install -g @useconductor/conductor</code>
               </pre>
-              <CopyButton text="npm install -g @thealxlabs/conductor" />
+              <CopyButton text="npm install -g @useconductor/conductor" />
             </div>
           </div>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

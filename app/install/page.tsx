@@ -22,14 +22,14 @@ const installMethods: InstallMethod[] = [
   {
     title: "npm",
     description: "Install globally via npm. Works on all platforms with Node.js 18+.",
-    command: "npm install -g @thealxlabs/conductor",
+    command: "npm install -g @useconductor/conductor",
     icon: Package,
     recommended: true,
   },
   {
     title: "npx",
     description: "Run without a global install. Useful for quick evaluation.",
-    command: "npx @thealxlabs/conductor",
+    command: "npx @useconductor/conductor",
     icon: Zap,
   },
   {
@@ -143,7 +143,7 @@ export default function InstallPage() {
                 {
                   platform: "macOS",
                   detail: "Homebrew or npm",
-                  extra: "brew install node && npm install -g @thealxlabs/conductor",
+                  extra: "brew install node && npm install -g @useconductor/conductor",
                 },
                 {
                   platform: "Linux",
@@ -153,7 +153,7 @@ export default function InstallPage() {
                 {
                   platform: "Windows",
                   detail: "npm or PowerShell",
-                  extra: "npm install -g @thealxlabs/conductor",
+                  extra: "npm install -g @useconductor/conductor",
                 },
               ].map((p) => (
                 <div

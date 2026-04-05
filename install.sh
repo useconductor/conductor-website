@@ -481,10 +481,10 @@ else
   elif command -v git &>/dev/null; then
     info "Cloning from GitHub..."
     run_step "Cloning conductor" \
-      git clone --depth=1 --quiet https://github.com/thealxlabs/conductor.git "$CONDUCTOR_DIR" || \
-      fail "Clone failed. Check your internet or run:\n  git clone https://github.com/thealxlabs/conductor.git"
+      git clone --depth=1 --quiet https://github.com/useconductor/conductor.git "$CONDUCTOR_DIR" || \
+      fail "Clone failed. Check your internet or run:\n  git clone https://github.com/useconductor/conductor.git"
   else
-    fail "git not found. Clone manually:\n  git clone https://github.com/thealxlabs/conductor.git && cd conductor && bash install.sh"
+    fail "git not found. Clone manually:\n  git clone https://github.com/useconductor/conductor.git && cd conductor && bash install.sh"
   fi
 fi
 

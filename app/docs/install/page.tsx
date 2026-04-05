@@ -3,8 +3,8 @@ import { ArrowRight, CheckCircle } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
 
 const installCmds = {
-  npm: "npm install -g @thealxlabs/conductor",
-  npx: "npx @thealxlabs/conductor",
+  npm: "npm install -g @useconductor/conductor",
+  npx: "npx @useconductor/conductor",
   macLinux: "curl -fsSL https://conductor.dev/install.sh | sh",
   windows: "irm https://conductor.dev/install.ps1 | iex",
 };
@@ -150,10 +150,10 @@ All systems operational.`}</code>
           <h2 className="mb-3 font-mono text-xl font-semibold">Updating</h2>
           <div className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#080808]">
             <pre className="p-4 pr-12 font-mono text-sm text-[#aaa]">
-              <code>npm update -g @thealxlabs/conductor</code>
+              <code>npm update -g @useconductor/conductor</code>
             </pre>
             <CopyButton
-              text="npm update -g @thealxlabs/conductor"
+              text="npm update -g @useconductor/conductor"
               className="absolute right-3 top-2.5"
             />
           </div>
