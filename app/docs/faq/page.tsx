@@ -9,7 +9,7 @@ const faqs = [
     items: [
       {
         q: "What is Conductor?",
-        a: "Conductor is a Model Context Protocol (MCP) server that exposes a plugin system as tools to AI agents. It gives any MCP-compatible AI client access to 100+ tools — file system operations, shell execution, git, databases, webhooks, and more — through a single config block.",
+        a: "Conductor is a Model Context Protocol (MCP) server that exposes a plugin system as tools to AI agents. 20+ tools work immediately with zero config — file system, shell, git, and more. Configure credentials to unlock 100+ total tools across databases, cloud services, and APIs.",
       },
       {
         q: "What makes Conductor different from using individual MCP servers?",
@@ -30,11 +30,11 @@ const faqs = [
     items: [
       {
         q: "Is Conductor secure?",
-        a: "Yes. Conductor uses AES-256-GCM encryption for secrets, strict command allowlisting for shell operations, user approval gates for dangerous tools, circuit breakers for fault tolerance, and SHA-256 chained audit logging for tamper-evident records. Secrets are stored in the OS keychain — never in config files.",
+        a: "Yes. Conductor uses AES-256-GCM encryption for secrets, strict command allowlisting for shell operations, user approval gates for dangerous tools, circuit breakers for fault tolerance, and SHA-256 chained audit logging for tamper-evident records. Secrets are stored in an encrypted local credential store (AES-256-GCM) — never in config files.",
       },
       {
         q: "Where are my API keys and secrets stored?",
-        a: "Secrets are stored in the OS keychain: macOS Keychain, Windows Credential Manager, or Linux libsecret (via libsecret / gnome-keyring). They are encrypted with AES-256-GCM before storage. They are never written to config.json or any plain-text file.",
+        a: "Secrets are stored in an encrypted local credential store (AES-256-GCM). They are never written to config.json or any plain-text file.",
       },
       {
         q: "Can the AI run any shell command it wants?",

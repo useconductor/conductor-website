@@ -82,13 +82,13 @@ const releases = [
     version: "1.3.0",
     date: "2024-12-18",
     tag: null,
-    summary: "Docker plugin, OS keychain integration for secrets.",
+    summary: "Docker plugin, encrypted local credential store for secrets.",
     breaking: [
       "Secrets in plaintext config.json are deprecated — migrate to `conductor secrets set`",
     ],
     added: [
       "New plugin: docker (containers, images, volumes, compose)",
-      "OS keychain integration: macOS Keychain, Windows Credential Manager, Linux libsecret",
+      "Encrypted local credential store (AES-256-GCM) for secrets",
       "`conductor secrets set / get / delete` commands",
       "AES-256-GCM encryption for all stored secrets",
     ],

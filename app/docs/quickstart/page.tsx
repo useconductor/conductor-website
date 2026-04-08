@@ -20,12 +20,12 @@ const clientConfigs: {
     config: `{
   "mcpServers": {
     "conductor": {
-      "command": "npx",
-      "args": ["-y", "@useconductor/conductor"]
+      "command": "conductor",
+      "args": ["mcp", "start"]
     }
   }
 }`,
-    note: "Restart Claude Desktop after saving.",
+    note: "Restart Claude Desktop after saving. Requires a global install (Step 1).",
   },
   {
     client: "Cursor",
@@ -33,8 +33,8 @@ const clientConfigs: {
     config: `{
   "mcpServers": {
     "conductor": {
-      "command": "npx",
-      "args": ["-y", "@useconductor/conductor"]
+      "command": "conductor",
+      "args": ["mcp", "start"]
     }
   }
 }`,
@@ -45,8 +45,8 @@ const clientConfigs: {
     config: `{
   "mcpServers": {
     "conductor": {
-      "command": "npx",
-      "args": ["-y", "@useconductor/conductor"]
+      "command": "conductor",
+      "args": ["mcp", "start"]
     }
   }
 }`,
@@ -57,8 +57,8 @@ const clientConfigs: {
     config: `{
   "mcpServers": {
     "conductor": {
-      "command": "npx",
-      "args": ["-y", "@useconductor/conductor"]
+      "command": "conductor",
+      "args": ["mcp", "start"]
     }
   }
 }`,
@@ -70,8 +70,8 @@ const clientConfigs: {
   "mcpServers": [
     {
       "name": "conductor",
-      "command": "npx",
-      "args": ["-y", "@useconductor/conductor"]
+      "command": "conductor",
+      "args": ["mcp", "start"]
     }
   ]
 }`,
@@ -108,7 +108,7 @@ export default function QuickStartPage() {
           Quick Start
         </h1>
         <p className="mt-3 text-[#666]">
-          Three steps: install, connect your AI client, verify it works.
+          Four steps: install, connect your AI client, verify 20+ tools work immediately, then configure more with credentials.
         </p>
       </div>
 
@@ -195,6 +195,27 @@ export default function QuickStartPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Step 4: Configure more */}
+        <section>
+          <div className="mb-4 flex items-center gap-3">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#1a1a1a] font-mono text-xs text-[#444]">4</span>
+            <h2 className="font-mono text-lg font-semibold">Configure more tools (optional)</h2>
+          </div>
+          <p className="mb-4 text-sm text-[#666]">
+            20+ tools work immediately with no credentials. To unlock additional plugins
+            (databases, cloud services, APIs), add credentials with:
+          </p>
+          <div className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#080808]">
+            <pre className="p-4 pr-12 font-mono text-sm text-[#aaa]">
+              <code>conductor plugins config &lt;name&gt; &lt;key&gt; &lt;value&gt;</code>
+            </pre>
+            <CopyButton text="conductor plugins config <name> <key> <value>" className="absolute right-3 top-2.5" />
+          </div>
+          <p className="mt-3 text-xs text-[#555]">
+            Example: <code className="font-mono text-[#666]">conductor plugins config github token ghp_yourtoken</code>
+          </p>
         </section>
 
         {/* Troubleshooting */}

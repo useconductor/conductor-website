@@ -89,13 +89,13 @@ const commandGroups: CommandGroup[] = [
   {
     title: "conductor config",
     description:
-      "Read and write Conductor configuration. Non-secret values are stored in ~/.conductor/config.json. Secret values (API keys) are stored in the OS keychain and never appear in config.json.",
+      "Read and write Conductor configuration. Non-secret values are stored in ~/.conductor/config.json. Secret values (API keys) are stored in the encrypted local credential store (AES-256-GCM) and never appear in config.json.",
     commands: [
       { cmd: "conductor config get <key>", desc: "Print a config value" },
       { cmd: "conductor config set <key> <value>", desc: "Set a non-secret config value" },
       { cmd: "conductor config list", desc: "Print all config values (secrets redacted)" },
       { cmd: "conductor config setup <plugin>", desc: "Run guided setup for a specific plugin" },
-      { cmd: "conductor config reset", desc: "Reset config to defaults (preserves secrets in keychain)" },
+      { cmd: "conductor config reset", desc: "Reset config to defaults (preserves secrets in credential store)" },
       { cmd: "conductor config export", desc: "Export non-secret config to stdout as JSON" },
     ],
   },
@@ -157,7 +157,7 @@ const commandGroups: CommandGroup[] = [
   {
     title: "conductor doctor",
     description:
-      "Diagnose your Conductor installation. Checks Node.js version, config file validity, plugin states, AI provider connectivity, database integrity, and keychain access.",
+      "Diagnose your Conductor installation. Checks Node.js version, config file validity, plugin states, AI provider connectivity, database integrity, and credential store access.",
     commands: [
       { cmd: "conductor doctor", desc: "Run all health checks and print a report" },
       { cmd: "conductor doctor --fix", desc: "Attempt to auto-fix common issues (reinstall deps, reset DB)" },
@@ -167,7 +167,7 @@ const commandGroups: CommandGroup[] = [
 # ✓ Node.js 18+ installed
 # ✓ ~/.conductor/config.json valid
 # ✓ ~/.conductor/conductor.db accessible
-# ✓ OS keychain accessible
+# ✓ Encrypted credential store accessible
 # ✓ All enabled plugins: ready
 # ✓ AI provider: connected (claude-3-5-sonnet-20241022)
 # ✓ Audit log: 1042 entries, chain intact

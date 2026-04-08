@@ -19,7 +19,6 @@ const builtinPlugins: PluginRow[] = [
   { name: "timezone", category: "Utilities", tools: 3, zeroConfig: true, description: "Convert time between zones, list zones" },
   { name: "url-tools", category: "Utilities", tools: 4, zeroConfig: true, description: "Parse URLs, expand short links, encode/decode" },
   { name: "cron", category: "Utilities", tools: 2, zeroConfig: true, description: "Parse cron expressions, next run times" },
-  { name: "fun", category: "Utilities", tools: 3, zeroConfig: true, description: "Jokes, random facts, coin flip" },
   // Developer
   { name: "shell", category: "Developer", tools: 4, zeroConfig: true, description: "Safe shell command execution (whitelist-based)" },
   { name: "github", category: "Developer", tools: 20, zeroConfig: "partial", description: "Issues, PRs, code search, releases, forks, notifications" },
@@ -120,7 +119,7 @@ export default class PlanetScalePlugin {
         key: "apiKey",
         label: "Service Token",
         type: "string",
-        secret: true,     // stored in OS keychain
+        secret: true,     // stored in encrypted credential store
         required: true,
         hint: "Create at app.planetscale.com/settings/service-tokens",
       },
@@ -424,7 +423,7 @@ export default function PluginsPage() {
             Plugins that require credentials define a <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">configSchema</code>.
             Running <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">conductor plugins setup &lt;name&gt;</code> walks
             through the fields interactively. Fields marked <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">secret: true</code> are
-            stored in your OS keychain — never in <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">config.json</code>.
+            stored in an encrypted local credential store (AES-256-GCM) — never in <code className="rounded bg-[#111] px-1.5 py-0.5 font-mono text-xs">config.json</code>.
           </p>
           <div className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#080808]">
             <div className="flex items-center justify-between border-b border-[#1a1a1a] px-4 py-3">
@@ -437,7 +436,7 @@ export default function PluginsPage() {
 ? GitHub Personal Access Token: ghp_••••••••••••
 ? Default organization (optional): myorg
 
-✓ Token stored in OS keychain
+✓ Token stored in encrypted credential store
 ✓ github plugin configured — 20 tools now active`}</code>
             </pre>
           </div>
@@ -464,7 +463,7 @@ export default function PluginsPage() {
           <div className="mt-4 space-y-2 rounded-lg border border-[#1a1a1a] bg-[#080808] p-4 text-xs text-[#555]">
             <p className="font-mono font-medium text-white">Key patterns in the example above:</p>
             <ul className="mt-2 space-y-1.5 text-[#444]">
-              <li><span className="font-mono text-[#666]">configSchema</span> — defines the credentials the user needs to provide; secret fields go to OS keychain</li>
+              <li><span className="font-mono text-[#666]">configSchema</span> — defines the credentials the user needs to provide; secret fields go to encrypted credential store</li>
               <li><span className="font-mono text-[#666]">initialize()</span> — reads secrets from keychain; only runs once on first tool call</li>
               <li><span className="font-mono text-[#666]">isConfigured()</span> — returns false until credentials are set, keeping tools out of MCP</li>
               <li><span className="font-mono text-[#666]">requiresApproval</span> — set this to true on any tool that mutates state (write, delete, send)</li>

@@ -50,29 +50,29 @@ const TerminalDemo = dynamic(
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const aiClients = [
+  { name: "Claude Desktop", abbr: "CD" },
   { name: "Claude Code", abbr: "CC" },
   { name: "Cursor", abbr: "CR" },
   { name: "Cline", abbr: "CL" },
-  { name: "Aider", abbr: "AI" },
   { name: "Windsurf", abbr: "WS" },
   { name: "Continue", abbr: "CO" },
-  { name: "Roo Code", abbr: "RC" },
-  { name: "Copilot", abbr: "GP" },
+  { name: "Zed", abbr: "ZD" },
+  { name: "Any MCP client", abbr: "MC" },
 ];
 
 const stats = [
-  { value: "100+", label: "plugins" },
-  { value: "8", label: "AI clients" },
-  { value: "1", label: "config line" },
-  { value: "AES-256", label: "encryption" },
+  { value: "15", label: "zero-config tools" },
+  { value: "269", label: "tools total" },
+  { value: "1", label: "config block" },
+  { value: "AES-256-GCM", label: "encryption" },
 ];
 
 const features = [
   {
     icon: Package,
-    title: "100+ Plugins",
+    title: "255 Tools",
     description:
-      "File system, shell, git, databases, APIs, webhooks — every tool your AI agent needs, all bundled and maintained.",
+      "15 tools work instantly with zero config. File system, shell, git, and more. Add credentials to unlock databases, APIs, webhooks, and cloud services.",
     detail: "npm install -g @useconductor/conductor",
   },
   {
@@ -117,25 +117,27 @@ const plugins = [
   { name: "Shell", description: "Execute with approval gates", icon: Terminal },
   { name: "Git", description: "Full git operations", icon: GitBranch },
   { name: "Web Fetch", description: "Fetch and parse content", icon: Globe },
-  { name: "Database", description: "SQLite, Postgres, MySQL", icon: Database },
-  { name: "Code Executor", description: "Isolated code sandboxes", icon: Code2 },
-  { name: "Email", description: "SMTP / IMAP integration", icon: Mail },
-  { name: "Cloud", description: "AWS, GCP, Azure", icon: Cloud },
-  { name: "Security", description: "Keychain and secrets", icon: Lock },
+  { name: "Database", description: "SQLite & Postgres", icon: Database },
+  { name: "Calculator", description: "Math expression evaluator", icon: Code2 },
+  { name: "Notes", description: "Markdown notes", icon: Mail },
+  { name: "Weather", description: "Current conditions", icon: Cloud },
+  { name: "Keychain", description: "OS credential store", icon: Lock },
   { name: "Webhooks", description: "In/out event handlers", icon: Webhook },
   { name: "Config", description: "Schema-validated config", icon: Settings },
   { name: "AI Manager", description: "Multi-provider routing", icon: Zap },
-  { name: "Docker", description: "Container management", icon: Box },
+  { name: "Docker", description: "Container CLI", icon: Box },
   { name: "GitHub", description: "PRs, issues, repos", icon: GitBranch },
   { name: "Slack", description: "Messages and channels", icon: MessageSquare },
-  { name: "Keychain", description: "OS credential store", icon: Key },
+  { name: "Gmail", description: "Read and send email", icon: Mail },
+  { name: "AWS", description: "EC2, S3, Lambda", icon: Cloud },
+  { name: "GCP", description: "Compute, Storage, Functions", icon: Cloud },
 ];
 
 const securityItems = [
   {
     icon: Lock,
     title: "AES-256-GCM encryption",
-    body: "Secrets are encrypted before storage. Key is derived from machine ID and stored in the OS keychain — never in config files.",
+    body: "Secrets are encrypted before storage using AES-256-GCM. Stored in an encrypted local credential store — never in config files.",
   },
   {
     icon: Shield,
@@ -145,7 +147,7 @@ const securityItems = [
   {
     icon: Eye,
     title: "Tamper-evident audit log",
-    body: "SHA-256 chained log at ~/.conductor/audit.log. Every modification to any entry breaks the chain and is immediately detectable.",
+    body: "SHA-256 chained log at ~/.conductor/audit.log. Every modification breaks the chain — run 'conductor audit verify' to detect tampering.",
   },
   {
     icon: AlertTriangle,
@@ -167,8 +169,8 @@ const securityItems = [
 const mcpConfig = `{
   "mcpServers": {
     "conductor": {
-      "command": "npx",
-      "args": ["-y", "@useconductor/conductor"]
+      "command": "conductor",
+      "args": ["mcp", "start"]
     }
   }
 }`;
@@ -227,7 +229,7 @@ export default function HomePage() {
           {/* Badge — renders immediately */}
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-1.5 font-mono text-xs text-[#555]">
             <span className="h-1.5 w-1.5 rounded-full bg-white" />
-            v2.0 — Now with 100+ plugins
+            v2.0 — 15 tools instantly, 80 tools with credentials
             <span className="mx-1 text-[#222]">/</span>
             <Link href="/docs/quickstart" className="text-[#666] hover:text-white transition-colors">
               Get started <ArrowRight className="inline h-3 w-3" />
@@ -242,9 +244,9 @@ export default function HomePage() {
           </h1>
 
           <p className="mx-auto mt-8 max-w-lg text-base leading-relaxed text-[#555]">
-            Give your AI agent access to 100+ tools with one config block.
-            Files, shell, git, databases, cloud — all through a single server
-            you control.
+            Give your AI agent 20+ tools the moment you connect — files, shell,
+            git, and more with zero config. Add credentials to unlock 100+ total
+            tools across cloud, databases, and APIs.
           </p>
 
           {/* CTAs */}
@@ -334,7 +336,7 @@ export default function HomePage() {
       {/* ── SCROLL VELOCITY ──────────────────────────────────── */}
       <div className="border-t border-[#1a1a1a]">
         <ScrollVelocity
-          text="CONDUCTOR — 100+ TOOLS — ANY AI CLIENT — ZERO VENDOR LOCK-IN — "
+          text="CONDUCTOR — 15 ZERO-CONFIG TOOLS — 269 TOTAL — ANY MCP CLIENT — ZERO VENDOR LOCK-IN — "
           velocity={2}
         />
       </div>
@@ -453,7 +455,7 @@ export default function HomePage() {
             <div>
               <Label>Plugins</Label>
               <h2 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
-                100+ plugins,<br />all maintained.
+                15 instantly,<br />269 total.
               </h2>
             </div>
             <p className="text-sm leading-relaxed text-[#555] lg:text-right">
@@ -508,7 +510,7 @@ export default function HomePage() {
                   <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[#2a2a2a]">
                     Your AI client
                   </p>
-                  {["Claude Code", "Cursor", "Cline", "Aider", "+ 4 more"].map((c) => (
+                  {["Claude Desktop", "Cursor", "Cline", "Windsurf", "+ more"].map((c) => (
                     <div
                       key={c}
                       className="rounded-md border border-[#111] bg-[#080808] px-3 py-2 font-mono text-xs text-[#555]"
@@ -570,7 +572,7 @@ export default function HomePage() {
       {/* ── SECOND SCROLL ────────────────────────────────────── */}
       <div className="border-t border-[#1a1a1a]">
         <ScrollVelocity
-          text="FILESYSTEM — SHELL — GIT — DATABASE — WEBHOOKS — EMAIL — CLOUD — AI — DOCKER — GITHUB — "
+          text="FILESYSTEM — SHELL — GIT — DATABASE — WEBHOOKS — NOTES — WEATHER — AI — DOCKER — GITHUB — "
           velocity={-1.5}
         />
       </div>
@@ -585,8 +587,9 @@ export default function HomePage() {
             you&apos;ll ever do.
           </h2>
           <p className="mx-auto mt-6 max-w-md text-sm leading-relaxed text-[#555]">
-            One command. One config block. Your AI agent gets 100+ tools —
-            files, code, git, databases, and more.
+            One command. One config block. Your AI agent gets 20+ tools
+            instantly — files, shell, git, and more. Configure credentials to
+            unlock 100+ total.
           </p>
           <div className="mx-auto mt-10 max-w-sm text-left">
             <div className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#060606]">
@@ -614,7 +617,7 @@ export default function HomePage() {
             </Link>
           </div>
           <p className="mt-8 font-mono text-xs text-[#222]">
-            Open source · MIT License · No vendor lock-in
+            Open source · Apache-2.0 License · No vendor lock-in
           </p>
         </div>
       </section>

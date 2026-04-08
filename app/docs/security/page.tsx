@@ -7,7 +7,7 @@ const securityCards = [
     icon: Lock,
     title: "AES-256-GCM Encryption",
     description:
-      "Secrets are encrypted at rest using AES-256-GCM. The encryption key is derived from the machine ID and stored in the OS keychain.",
+      "Secrets are encrypted at rest using AES-256-GCM. Stored in an encrypted local credential store — never in config files.",
   },
   {
     icon: Shield,
@@ -35,9 +35,9 @@ const securityCards = [
   },
   {
     icon: Key,
-    title: "OS Keychain Integration",
+    title: "Encrypted Credential Store",
     description:
-      "Secrets are stored in the OS keychain: macOS Keychain, Windows Credential Manager, or Linux libsecret.",
+      "Secrets are stored in an encrypted local credential store (AES-256-GCM). Never written to config.json or any plain-text file.",
   },
 ];
 
@@ -132,7 +132,7 @@ export default function SecurityPage() {
               "Plugin configSchema marks the field with secret: true",
               "conductor config setup prompts for the value",
               "Value is encrypted with AES-256-GCM using a machine-bound key",
-              "Encrypted value is stored in the OS keychain",
+              "Encrypted value is stored in the encrypted local credential store",
               "At runtime, Conductor decrypts on demand — never written to disk",
             ].map((step, i) => (
               <li key={i} className="flex items-start gap-3 text-sm text-[#666]">
