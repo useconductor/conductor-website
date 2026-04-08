@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Terminal,
   Shield,
@@ -63,7 +63,7 @@ const aiClients = [
 const stats = [
   { value: "15", label: "zero-config tools" },
   { value: "269", label: "tools total" },
-  { value: "1", label: "config block" },
+  { value: "500+", label: "GitHub stars" },
   { value: "AES-256-GCM", label: "encryption" },
 ];
 
