@@ -113,24 +113,23 @@ const features = [
 ];
 
 const plugins = [
-  { name: "File System", description: "Read, write, search files", icon: FileText },
-  { name: "Shell", description: "Execute with approval gates", icon: Terminal },
-  { name: "Git", description: "Full git operations", icon: GitBranch },
-  { name: "Web Fetch", description: "Fetch and parse content", icon: Globe },
-  { name: "Database", description: "SQLite & Postgres", icon: Database },
-  { name: "Calculator", description: "Math expression evaluator", icon: Code2 },
-  { name: "Notes", description: "Markdown notes", icon: Mail },
-  { name: "Weather", description: "Current conditions", icon: Cloud },
-  { name: "Keychain", description: "OS credential store", icon: Lock },
-  { name: "Webhooks", description: "In/out event handlers", icon: Webhook },
-  { name: "Config", description: "Schema-validated config", icon: Settings },
-  { name: "AI Manager", description: "Multi-provider routing", icon: Zap },
-  { name: "Docker", description: "Container CLI", icon: Box },
-  { name: "GitHub", description: "PRs, issues, repos", icon: GitBranch },
-  { name: "Slack", description: "Messages and channels", icon: MessageSquare },
-  { name: "Gmail", description: "Read and send email", icon: Mail },
-  { name: "AWS", description: "EC2, S3, Lambda", icon: Cloud },
-  { name: "GCP", description: "Compute, Storage, Functions", icon: Cloud },
+  { name: "File System", description: "Read, write, search files", icon: FileText, href: "/docs/plugins/file-system" },
+  { name: "Shell", description: "Execute with approval gates", icon: Terminal, href: "/docs/plugins/shell" },
+  { name: "Git", description: "Full git operations", icon: GitBranch, href: "/docs/plugins/git" },
+  { name: "Web Fetch", description: "Fetch and parse content", icon: Globe, href: "/docs/plugins/web-fetch" },
+  { name: "Database", description: "SQLite & Postgres", icon: Database, href: "/docs/plugins/database" },
+  { name: "Calculator", description: "Math expression evaluator", icon: Code2, href: "/docs/plugins/calculator" },
+  { name: "Notes", description: "Markdown notes", icon: Mail, href: "/docs/plugins/notes" },
+  { name: "Weather", description: "Current conditions", icon: Cloud, href: "/docs/plugins/weather" },
+  { name: "Keychain", description: "OS credential store", icon: Lock, href: "/docs/plugins/keychain" },
+  { name: "Webhooks", description: "In/out event handlers", icon: Webhook, href: "/docs/plugins/webhooks" },
+  { name: "Cron", description: "Scheduled tasks", icon: Settings, href: "/docs/plugins/cron" },
+  { name: "Docker", description: "Container CLI", icon: Box, href: "/docs/plugins/docker" },
+  { name: "GitHub", description: "PRs, issues, repos", icon: GitBranch, href: "/docs/plugins/github" },
+  { name: "Slack", description: "Messages and channels", icon: MessageSquare, href: "/docs/plugins/slack" },
+  { name: "Gmail", description: "Read and send email", icon: Mail, href: "/docs/plugins/gmail" },
+  { name: "AWS", description: "EC2, S3, Lambda", icon: Cloud, href: "/docs/plugins/aws" },
+  { name: "GCP", description: "Compute, Storage, Functions", icon: Cloud, href: "/docs/plugins/gcp" },
 ];
 
 const securityItems = [
@@ -470,15 +469,17 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 gap-px bg-[#1a1a1a] sm:grid-cols-3 lg:grid-cols-4">
             {plugins.map((p) => (
-              <SpotlightCard key={p.name} className="rounded-none border-0 bg-[#050505] p-5">
-                <div className="flex items-start gap-3">
-                  <p.icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#2a2a2a]" />
-                  <div>
-                    <h3 className="font-mono text-xs font-semibold leading-tight">{p.name}</h3>
-                    <p className="mt-1 text-[10px] leading-relaxed text-[#444]">{p.description}</p>
+              <Link key={p.name} href={p.href || "/docs/plugins"} className="block">
+                <SpotlightCard className="rounded-none border-0 bg-[#050505] p-5 transition-colors hover:bg-[#0a0a0a]">
+                  <div className="flex items-start gap-3">
+                    <p.icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#2a2a2a]" />
+                    <div>
+                      <h3 className="font-mono text-xs font-semibold leading-tight">{p.name}</h3>
+                      <p className="mt-1 text-[10px] leading-relaxed text-[#444]">{p.description}</p>
+                    </div>
                   </div>
-                </div>
-              </SpotlightCard>
+                </SpotlightCard>
+              </Link>
             ))}
           </div>
           <div className="mt-8 text-center">

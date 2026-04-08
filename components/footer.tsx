@@ -122,7 +122,7 @@ export function Footer() {
               &copy; 2026 Conductor
             </p>
             <span className="text-[#1a1a1a]">/</span>
-            <p className="font-mono text-xs text-[#333]">MIT License</p>
+            <p className="font-mono text-xs text-[#333]">Apache-2.0 License</p>
             <span className="text-[#1a1a1a]">/</span>
             <p className="font-mono text-xs text-[#333]">Built by TheAlxLabs</p>
           </div>
