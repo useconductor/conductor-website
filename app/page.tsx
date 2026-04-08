@@ -63,7 +63,7 @@ const aiClients = [
 const stats = [
   { value: "15", label: "zero-config tools" },
   { value: "269", label: "tools total" },
-  { value: "500+", label: "GitHub stars" },
+  { value: "2", label: "GitHub stars" },
   { value: "AES-256-GCM", label: "encryption" },
 ];
 
