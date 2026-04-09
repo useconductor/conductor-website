@@ -8,7 +8,7 @@ import {
   XCircle, Shield, Key, Cloud, ChevronRight, Eye, EyeOff,
   Github, MessageSquare, Mail, FileText, CreditCard, TrendingUp,
   Rocket, ClipboardList, Cloud as CloudIcon, Globe, 
-  Smartphone, Download, Upload, Settings, LogOut, Copy
+  Smartphone, Download, Upload, Settings, LogOut, Copy, FileText as AuditIcon
 } from "lucide-react";
 import { 
   isLoggedIn, getCurrentUser, logout, 
@@ -46,6 +46,8 @@ function DashboardContent() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDevicesModal, setShowDevicesModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showAuditModal, setShowAuditModal] = useState(false);
+  const [auditLogs, setAuditLogs] = useState<{timestamp: string, tool: string, result: string, details?: string}[]>([]);
   const [selectedPlugin, setSelectedPlugin] = useState<string | null>(null);
   const [editingPlugin, setEditingPlugin] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState("");
@@ -154,6 +156,18 @@ function DashboardContent() {
     router.push("/");
   };
 
+  const handleViewAuditLog = () => {
+    // Demo audit logs - in real app would fetch from API
+    setAuditLogs([
+      { timestamp: new Date().toISOString(), tool: 'github.list_repos', result: 'success', details: 'Fetched 12 repositories' },
+      { timestamp: new Date(Date.now() - 3600000).toISOString(), tool: 'slack.send_message', result: 'success', details: 'Message sent to #general' },
+      { timestamp: new Date(Date.now() - 7200000).toISOString(), tool: 'database.query', result: 'success', details: 'SELECT * FROM users' },
+      { timestamp: new Date(Date.now() - 10800000).toISOString(), tool: 'filesystem.read', result: 'success', details: 'Read config.json' },
+      { timestamp: new Date(Date.now() - 14400000).toISOString(), tool: 'github.create_issue', result: 'success', details: 'Created issue #42' },
+    ]);
+    setShowAuditModal(true);
+  };
+
   const handleExport = () => {
     const data = localStorage.getItem('cloud_credentials') || '{}';
     const blob = new Blob([data], { type: 'application/json' });
@@ -212,6 +226,13 @@ function DashboardContent() {
             >
               <Smartphone className="h-4 w-4" />
               Devices
+            </button>
+            <button
+              onClick={handleViewAuditLog}
+              className="flex items-center gap-2 text-sm text-[#666] hover:text-white"
+            >
+              <AuditIcon className="h-4 w-4" />
+              Audit
             </button>
             <button
               onClick={handleLogout}
@@ -511,6 +532,56 @@ function DashboardContent() {
 
             <button
               onClick={() => setShowExportModal(false)}
+              className="w-full mt-4 py-3 rounded-lg border border-[#1a1a1a] text-[#666] hover:text-white font-mono text-sm"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Audit Log Modal */}
+      {showAuditModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-2xl max-h-[80vh] rounded-lg border border-[#1a1a1a] bg-[#080808] p-6 overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-mono text-xl font-bold text-white">Audit Log</h3>
+              <button onClick={() => setShowAuditModal(false)} className="text-[#666] hover:text-white">
+                <XCircle className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto">
+              <table className="w-full">
+                <thead className="sticky top-0 bg-[#080808]">
+                  <tr className="text-left text-xs text-[#444] font-mono">
+                    <th className="pb-3">Timestamp</th>
+                    <th className="pb-3">Tool</th>
+                    <th className="pb-3">Result</th>
+                    <th className="pb-3">Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auditLogs.map((log, i) => (
+                    <tr key={i} className="border-t border-[#1a1a1a]">
+                      <td className="py-3 text-xs text-[#666] font-mono">
+                        {new Date(log.timestamp).toLocaleString()}
+                      </td>
+                      <td className="py-3 text-sm text-white font-mono">{log.tool}</td>
+                      <td className="py-3">
+                        <span className={`text-xs ${log.result === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                          {log.result}
+                        </span>
+                      </td>
+                      <td className="py-3 text-xs text-[#666]">{log.details}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <button
+              onClick={() => setShowAuditModal(false)}
               className="w-full mt-4 py-3 rounded-lg border border-[#1a1a1a] text-[#666] hover:text-white font-mono text-sm"
             >
               Close

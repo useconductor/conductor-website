@@ -9,6 +9,7 @@ const navLinks = [
   { href: "/docs", label: "Docs" },
   { href: "/docs/plugins", label: "Plugins" },
   { href: "/marketplace", label: "Marketplace" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/install", label: "Install" },
 ];
 

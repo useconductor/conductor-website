@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, IBM_Plex_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -11,16 +11,59 @@ const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-mono",
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#050505',
+};
+
 export const metadata: Metadata = {
-  title: "Conductor — One connection. Every tool.",
-  description:
-    "The single MCP server that gives any AI agent access to 100+ tools. Connect Claude Code, Cursor, Cline, and more to your entire system.",
-  keywords: ["MCP", "AI", "Claude", "Cursor", "Cline", "tools", "plugins"],
+  metadataBase: new URL('https://conductor.sh'),
+  title: {
+    default: 'Conductor — MCP Server for AI Agents',
+    template: '%s | Conductor',
+  },
+  description: 'The single MCP server that gives AI agents access to 255+ tools. Connect Claude, Cursor, Cline to GitHub, Slack, databases, and more. Zero-config, free forever.',
+  keywords: ['MCP', 'Model Context Protocol', 'AI', 'Claude', 'Cursor', 'Cline', 'tools', 'plugins', 'MCP server', 'AI agents', 'developer tools'],
+  authors: [{ name: 'TheAlxLabs', url: 'https://thealxlabs.ca' }],
+  creator: 'TheAlxLabs',
+  publisher: 'TheAlxLabs',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
-    title: "Conductor — One connection. Every tool.",
-    description:
-      "The single MCP server that gives any AI agent access to 100+ tools.",
-    type: "website",
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://conductor.sh',
+    siteName: 'Conductor',
+    title: 'Conductor — MCP Server for AI Agents',
+    description: 'The single MCP server that gives AI agents access to 255+ tools. Connect Claude, Cursor, Cline to GitHub, Slack, databases, and more.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Conductor - MCP Server',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Conductor — MCP Server for AI Agents',
+    description: 'The single MCP server that gives AI agents access to 255+ tools.',
+    creator: '@conductormcp',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: 'https://conductor.sh',
   },
 };
 
