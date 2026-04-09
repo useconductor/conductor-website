@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
   Terminal, Plus, Trash2, RefreshCw, CheckCircle, 
-  XCircle, Shield, Key, Cloud, ChevronRight, Eye, EyeOff
+  XCircle, Shield, Key, Cloud, ChevronRight, Eye, EyeOff,
+  Github, MessageSquare, Mail, FileText, CreditCard, TrendingUp,
+  Rocket, ClipboardList, Cloud as CloudIcon, Globe
 } from "lucide-react";
 import { 
-  isLoggedIn, getCurrentUser, logout, getDevices, revokeDevice,
+  isLoggedIn, getCurrentUser, logout, 
   getCredentials, storeCredential, deleteCredential, syncCredentials 
 } from "@/lib/cloud-api";
 import { 
@@ -18,16 +20,16 @@ import {
 
 // Available plugins that can be configured
 const PLUGINS = [
-  { id: "github", name: "GitHub", icon: "🐙", description: "Issues, PRs, repos" },
-  { id: "slack", name: "Slack", icon: "💼", description: "Messages, channels" },
-  { id: "gmail", name: "Gmail", icon: "📧", description: "Email, calendar" },
-  { id: "notion", name: "Notion", icon: "📝", description: "Pages, databases" },
-  { id: "stripe", name: "Stripe", icon: "💳", description: "Payments" },
-  { id: "linear", name: "Linear", icon: "📈", description: "Issues, projects" },
-  { id: "vercel", name: "Vercel", icon: "▲", description: "Deployments" },
-  { id: "jira", name: "Jira", icon: "📋", description: "Issues, sprints" },
-  { id: "aws", name: "AWS", icon: "☁️", description: "EC2, S3, Lambda" },
-  { id: "gcp", name: "GCP", icon: "🌐", description: "Compute, Storage" },
+  { id: "github", name: "GitHub", icon: Github, description: "Issues, PRs, repos" },
+  { id: "slack", name: "Slack", icon: MessageSquare, description: "Messages, channels" },
+  { id: "gmail", name: "Gmail", icon: Mail, description: "Email, calendar" },
+  { id: "notion", name: "Notion", icon: FileText, description: "Pages, databases" },
+  { id: "stripe", name: "Stripe", icon: CreditCard, description: "Payments" },
+  { id: "linear", name: "Linear", icon: TrendingUp, description: "Issues, projects" },
+  { id: "vercel", name: "Vercel", icon: Rocket, description: "Deployments" },
+  { id: "jira", name: "Jira", icon: ClipboardList, description: "Issues, sprints" },
+  { id: "aws", name: "AWS", icon: CloudIcon, description: "EC2, S3, Lambda" },
+  { id: "gcp", name: "GCP", icon: Globe, description: "Compute, Storage" },
 ];
 
 export default function DashboardPage() {
@@ -207,7 +209,7 @@ export default function DashboardPage() {
                   className={`flex items-center justify-between p-4 ${i < PLUGINS.length - 1 ? 'border-b border-[#1a1a1a]' : ''}`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{plugin.icon}</span>
+                    <plugin.icon className="h-6 w-6 text-[#666]" />
                     <div>
                       <p className="font-mono text-sm text-white">{plugin.name}</p>
                       <p className="text-xs text-[#444]">{plugin.description}</p>

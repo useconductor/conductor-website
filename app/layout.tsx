@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${inter.variable} ${ibmPlexMono.variable} bg-[#050505] font-sans text-white antialiased`}
+        className={`${inter.variable} ${ibmPlexMono.variable} bg-[#050505] font-sans text-white antialiased overflow-x-hidden`}
       >
         <Navbar />
         <main className="min-h-screen">{children}</main>

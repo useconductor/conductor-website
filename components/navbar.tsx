@@ -10,7 +10,6 @@ const navLinks = [
   { href: "/docs/plugins", label: "Plugins" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/install", label: "Install" },
-  { href: "/dashboard", label: "Dashboard" },
 ];
 
 export function Navbar() {
@@ -78,10 +77,10 @@ export function Navbar() {
           </a>
           <div className="h-4 w-px bg-[#1a1a1a]" />
           <Link
-            href="/docs/quickstart"
+            href="/login"
             className="rounded-md bg-white px-3.5 py-1.5 font-mono text-xs font-semibold text-black transition-colors hover:bg-[#e8e8e8]"
           >
-            Get Started
+            Sign In
           </Link>
         </div>
 
@@ -118,11 +117,11 @@ export function Navbar() {
               GitHub
             </a>
             <Link
-              href="/docs/quickstart"
+              href="/login"
               className="mt-2 inline-block w-full rounded-md bg-white px-4 py-2.5 text-center font-mono text-sm font-semibold text-black"
               onClick={() => setOpen(false)}
             >
-              Get Started
+              Sign In
             </Link>
           </nav>
         </div>
