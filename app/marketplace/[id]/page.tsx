@@ -24,6 +24,12 @@ type PluginData = {
   credentials?: { name: string; required: boolean; description: string }[];
   features: string[];
   useCases: string[];
+  pricing: string;
+  rateLimit: string;
+  auth: string;
+  platform: string;
+  docsUrl?: string;
+  websiteUrl?: string;
 };
 
 const PLUGINS: Record<string, PluginData> = {
@@ -53,7 +59,11 @@ const PLUGINS: Record<string, PluginData> = {
       "Manage project tasks and deadlines",
       "Inventory tracking and management",
       "Event planning and registration"
-    ]
+    ],
+    pricing: "Free tier available, paid plans from $10/user/month",
+    rateLimit: "5 requests/second",
+    auth: "API Token",
+    platform: "Cloud (Airtable hosted)",
   },
   asana: {
     name: "Asana",
@@ -81,7 +91,11 @@ const PLUGINS: Record<string, PluginData> = {
       "Daily standup summaries",
       "Project progress reporting",
       "Sprint planning assistance"
-    ]
+    ],
+    pricing: "Free for teams up to 15 members",
+    rateLimit: "100 requests/minute",
+    auth: "API Token",
+    platform: "Cloud (Asana hosted)",
   },
   anthropic: {
     name: "Anthropic",
@@ -109,7 +123,12 @@ const PLUGINS: Record<string, PluginData> = {
       "Complex reasoning tasks",
       "Document analysis and summarization",
       "Multi-step problem solving"
-    ]
+    ],
+    pricing: "Pay per million tokens (~$3-15/million)",
+    rateLimit: "50 requests/minute (varies by plan)",
+    auth: "API Key",
+    platform: "Cloud (Anthropic hosted)",
+    docsUrl: "https://docs.anthropic.com",
   },
   discord: {
     name: "Discord",
@@ -137,7 +156,12 @@ const PLUGINS: Record<string, PluginData> = {
       "Community welcome messages",
       "Incident alert automation",
       "Team activity summaries"
-    ]
+    ],
+    pricing: "Free for small servers, paid plans for large communities",
+    rateLimit: "10 requests/second",
+    auth: "Bot Token",
+    platform: "Cloud (Discord hosted)",
+    docsUrl: "https://discord.com/developers/docs",
   },
   github: {
     name: "GitHub",
@@ -165,7 +189,13 @@ const PLUGINS: Record<string, PluginData> = {
       "Issue triage and management",
       "Release note generation",
       "Repository health checks"
-    ]
+    ],
+    pricing: "Free for public repos, paid for private ($4/month)",
+    rateLimit: "5,000 requests/hour",
+    auth: "Personal Access Token",
+    platform: "Cloud (GitHub hosted)",
+    docsUrl: "https://docs.github.com",
+    websiteUrl: "https://github.com",
   },
   gmail: {
     name: "Gmail",
@@ -193,7 +223,13 @@ const PLUGINS: Record<string, PluginData> = {
       "Automated follow-up reminders",
       "Support ticket routing",
       "Daily digest generation"
-    ]
+    ],
+    pricing: "Free (15GB) or $2/month for 100GB",
+    rateLimit: "Gmail API limits apply",
+    auth: "OAuth 2.0",
+    platform: "Cloud (Google hosted)",
+    docsUrl: "https://developers.google.com/gmail/api",
+    websiteUrl: "https://gmail.com",
   },
   jira: {
     name: "Jira",
@@ -221,7 +257,13 @@ const PLUGINS: Record<string, PluginData> = {
       "Issue creation from Slack",
       "Status update notifications",
       "Release ticket tracking"
-    ]
+    ],
+    pricing: "Free for up to 10 users, paid from $7.50/user/month",
+    rateLimit: "10 requests/second",
+    auth: "API Token + Instance URL",
+    platform: "Cloud or Self-hosted (Atlassian)",
+    docsUrl: "https://developer.atlassian.com/cloud/jira/platform",
+    websiteUrl: "https://atlassian.com/software/jira",
   },
   linear: {
     name: "Linear",
@@ -249,7 +291,13 @@ const PLUGINS: Record<string, PluginData> = {
       "Cycle summary reports",
       "Sprint planning automation",
       "Team capacity planning"
-    ]
+    ],
+    pricing: "Free for small teams, paid from $8/user/month",
+    rateLimit: "100 requests/minute",
+    auth: "API Key",
+    platform: "Cloud (Linear hosted)",
+    docsUrl: "https://developers.linear.app",
+    websiteUrl: "https://linear.app",
   },
   notion: {
     name: "Notion",
@@ -277,7 +325,13 @@ const PLUGINS: Record<string, PluginData> = {
       "Meeting notes automation",
       "Project documentation",
       "CRM and data tracking"
-    ]
+    ],
+    pricing: "Free for personal, paid from $10/user/month",
+    rateLimit: "3 requests/second",
+    auth: "Internal Integration Token",
+    platform: "Cloud (Notion hosted)",
+    docsUrl: "https://developers.notion.com",
+    websiteUrl: "https://notion.so",
   },
   slack: {
     name: "Slack",
@@ -305,7 +359,13 @@ const PLUGINS: Record<string, PluginData> = {
       "Incident alert escalation",
       "Daily standup summaries",
       "Support ticket routing"
-    ]
+    ],
+    pricing: "Free for small teams, paid from $8.75/user/month",
+    rateLimit: "20 requests/second",
+    auth: "Bot Token + App Token",
+    platform: "Cloud (Slack hosted)",
+    docsUrl: "https://api.slack.com",
+    websiteUrl: "https://slack.com",
   },
   stripe: {
     name: "Stripe",
@@ -333,7 +393,13 @@ const PLUGINS: Record<string, PluginData> = {
       "Refund processing automation",
       "Payment failure alerts",
       "Subscription health checks"
-    ]
+    ],
+    pricing: "2.9% + 30¢ per transaction",
+    rateLimit: "100 requests/second",
+    auth: "Secret Key",
+    platform: "Cloud (Stripe hosted)",
+    docsUrl: "https://stripe.com/docs",
+    websiteUrl: "https://stripe.com",
   },
   vercel: {
     name: "Vercel",
@@ -361,7 +427,13 @@ const PLUGINS: Record<string, PluginData> = {
       "Build failure alerts",
       "Environment variable management",
       "Domain configuration"
-    ]
+    ],
+    pricing: "Free hobby tier, Pro from $20/month",
+    rateLimit: "100 requests/second",
+    auth: "Access Token",
+    platform: "Cloud (Vercel hosted)",
+    docsUrl: "https://vercel.com/docs",
+    websiteUrl: "https://vercel.com",
   },
 };
 
@@ -492,6 +564,25 @@ export default async function MarketplacePluginPage({ params }: { params: Promis
           </div>
         )}
 
+        <div className="mb-8 grid grid-cols-2 gap-4">
+          <div className="rounded border border-[#1a1a1a] bg-[#080808] p-4">
+            <h3 className="font-mono text-xs text-[#555] mb-2">Pricing</h3>
+            <p className="text-sm text-white">{plugin.pricing}</p>
+          </div>
+          <div className="rounded border border-[#1a1a1a] bg-[#080808] p-4">
+            <h3 className="font-mono text-xs text-[#555] mb-2">Rate Limit</h3>
+            <p className="text-sm text-white">{plugin.rateLimit}</p>
+          </div>
+          <div className="rounded border border-[#1a1a1a] bg-[#080808] p-4">
+            <h3 className="font-mono text-xs text-[#555] mb-2">Auth Type</h3>
+            <p className="text-sm text-white">{plugin.auth}</p>
+          </div>
+          <div className="rounded border border-[#1a1a1a] bg-[#080808] p-4">
+            <h3 className="font-mono text-xs text-[#555] mb-2">Platform</h3>
+            <p className="text-sm text-white">{plugin.platform}</p>
+          </div>
+        </div>
+
         <div className="flex gap-4 border-t border-[#1a1a1a] pt-6">
           <Link
             href="/docs/plugins"
@@ -500,6 +591,28 @@ export default async function MarketplacePluginPage({ params }: { params: Promis
             View full documentation
             <ExternalLink className="h-3 w-3" />
           </Link>
+          {plugin.docsUrl && (
+            <a
+              href={plugin.docsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-[#666] hover:text-white"
+            >
+              Official docs
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          )}
+          {plugin.websiteUrl && (
+            <a
+              href={plugin.websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-[#666] hover:text-white"
+            >
+              Visit website
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          )}
         </div>
       </div>
     </div>
