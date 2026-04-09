@@ -37,6 +37,246 @@ type PluginDoc = {
 };
 
 const PLUGINS: Record<string, PluginDoc> = {
+  "file-system": {
+    name: "File System",
+    category: "Utilities",
+    description: "Read, write, search, and manage files and directories.",
+    longDescription:
+      "The File System plugin gives your AI full access to the local filesystem. Read files, write content, search with grep patterns, list directories, and manage file metadata. Runs in a sandbox restricted to the working directory.",
+    zeroConfig: true,
+    zeroConfigNote: "Works immediately. Restricted to working directory for safety.",
+    credentials: [],
+    tools: [
+      { name: "fs_read", desc: "Read file contents", inputs: "path", approval: false },
+      { name: "fs_write", desc: "Write content to a file", inputs: "path, content", approval: true },
+      { name: "fs_exists", desc: "Check if file or directory exists", inputs: "path", approval: false },
+      { name: "fs_mkdir", desc: "Create a directory", inputs: "path", approval: true },
+      { name: "fs_remove", desc: "Remove a file or directory", inputs: "path", approval: true },
+      { name: "fs_list", desc: "List directory contents", inputs: "path, filter?", approval: false },
+      { name: "fs_search", desc: "Search files by name pattern", inputs: "directory, pattern", approval: false },
+      { name: "fs_grep", desc: "Search file contents", inputs: "pattern, path, extensions?", approval: false },
+      { name: "fs_stat", desc: "Get file metadata", inputs: "path", approval: false },
+    ],
+    examples: [
+      { prompt: "Show me the contents of README.md", tool: "fs_read" },
+      { prompt: "Create a new file called notes.txt", tool: "fs_write" },
+      { prompt: "Find all TypeScript files in src/", tool: "fs_search" },
+    ],
+    setup: "Zero-config. Sandboxed to working directory by default.",
+  },
+  git: {
+    name: "Git",
+    category: "Developer",
+    description: "Full git operations: commit, push, branch, status, and more.",
+    longDescription:
+      "Execute git commands directly from your AI. Commit changes, create and switch branches, push to remotes, view history, and manage remotes. All standard git operations are supported.",
+    zeroConfig: true,
+    zeroConfigNote: "Works immediately if git is installed and repo is initialized.",
+    credentials: [],
+    tools: [
+      { name: "git_status", desc: "Show working tree status", inputs: "repo?", approval: false },
+      { name: "git_add", desc: "Stage files for commit", inputs: "paths, repo?", approval: true },
+      { name: "git_commit", desc: "Commit staged changes", inputs: "message, repo?", approval: true },
+      { name: "git_push", desc: "Push commits to remote", inputs: "remote?, branch?, repo?", approval: true },
+      { name: "git_pull", desc: "Pull changes from remote", inputs: "remote?, branch?, repo?", approval: true },
+      { name: "git_branch", desc: "List, create, or delete branches", inputs: "action, name?, repo?", approval: false },
+      { name: "git_checkout", desc: "Switch branches or restore files", inputs: "branch|path, repo?", approval: true },
+      { name: "git_log", desc: "Show commit history", inputs: "repo?, limit?", approval: false },
+      { name: "git_diff", desc: "Show changes between commits", inputs: "from?, to?, repo?", approval: false },
+      { name: "git_remote", desc: "Manage remote repositories", inputs: "action, name?, url?, repo?", approval: false },
+    ],
+    examples: [
+      { prompt: "What's the status of my repo?", tool: "git_status" },
+      { prompt: "Commit my changes with a message", tool: "git_commit" },
+      { prompt: "Show me the last 5 commits", tool: "git_log" },
+    ],
+    setup: "Zero-config. Requires git CLI installed and initialized repository.",
+  },
+  "web-fetch": {
+    name: "Web Fetch",
+    category: "Utilities",
+    description: "Fetch URLs, parse HTML, extract data from web pages.",
+    longDescription:
+      "Fetch any public URL and extract structured data. Parse HTML for content, follow redirects, and handle JSON APIs. Essential for web scraping and API integration.",
+    zeroConfig: true,
+    zeroConfigNote: "Works immediately. Rate limited to prevent abuse.",
+    credentials: [],
+    tools: [
+      { name: "web_fetch", desc: "Fetch a URL and return content", inputs: "url, parser?", approval: false },
+      { name: "web_parse", desc: "Parse HTML and extract elements", inputs: "html, selector", approval: false },
+      { name: "web_json", desc: "Fetch and parse JSON from API", inputs: "url", approval: false },
+    ],
+    examples: [
+      { prompt: "What's on example.com?", tool: "web_fetch" },
+      { prompt: "Get the JSON from this API endpoint", tool: "web_json" },
+    ],
+    setup: "Zero-config. Rate limited to 100 requests/minute.",
+  },
+  database: {
+    name: "Database",
+    category: "Developer",
+    description: "Query SQLite, PostgreSQL, MySQL, and MongoDB databases.",
+    longDescription:
+      "Connect to databases and run queries. Supports SQLite (local files), PostgreSQL, MySQL, and MongoDB. Use for data exploration, migrations, and building AI-powered database tools.",
+    zeroConfig: "partial",
+    zeroConfigNote: "SQLite works without config. Other databases require connection string.",
+    credentials: [
+      { name: "DATABASE_URL", label: "Connection URL", url: "Postgres/MySQL/Mongo connection string", required: false },
+    ],
+    tools: [
+      { name: "db_query", desc: "Run a SQL query", inputs: "query, database?", approval: true },
+      { name: "db_tables", desc: "List tables in database", inputs: "database?", approval: false },
+      { name: "db_schema", desc: "Get table schema", inputs: "table, database?", approval: false },
+      { name: "db_execute", desc: "Execute a statement", inputs: "statement, database?", approval: true },
+    ],
+    examples: [
+      { prompt: "What tables are in my database?", tool: "db_tables" },
+      { prompt: "Run this SQL query", tool: "db_query" },
+    ],
+    setup: `conductor config set plugins.database.url "postgresql://user:pass@host/db"
+# Or for SQLite (no config needed):
+conductor config set plugins.database.type "sqlite"`,
+  },
+  notes: {
+    name: "Notes",
+    category: "Productivity",
+    description: "Create and manage markdown notes with search.",
+    longDescription:
+      "A personal note-taking system backed by markdown files. Create, read, search, and organize notes. Notes are stored in ~/.conductor/notes/ by default.",
+    zeroConfig: true,
+    zeroConfigNote: "Works immediately. Stores notes in ~/.conductor/notes/",
+    credentials: [],
+    tools: [
+      { name: "notes_create", desc: "Create a new note", inputs: "title, content", approval: false },
+      { name: "notes_read", desc: "Read a note by title", inputs: "title", approval: false },
+      { name: "notes_list", desc: "List all notes", inputs: "filter?", approval: false },
+      { name: "notes_search", desc: "Search notes by content", inputs: "query", approval: false },
+      { name: "notes_delete", desc: "Delete a note", inputs: "title", approval: true },
+      { name: "notes_update", desc: "Update an existing note", inputs: "title, content", approval: true },
+    ],
+    examples: [
+      { prompt: "Create a note called 'meeting-notes' with today's notes", tool: "notes_create" },
+      { prompt: "Find all notes about AI", tool: "notes_search" },
+    ],
+    setup: "Zero-config. Notes stored in ~/.conductor/notes/",
+  },
+  keychain: {
+    name: "Keychain",
+    category: "Utilities",
+    description: "Securely store and retrieve credentials from OS keychain.",
+    longDescription:
+      "Store API keys, tokens, and secrets securely in the operating system's keychain (macOS Keychain, Windows Credential Manager, or Linux libsecret). Essential for plugin credentials.",
+    zeroConfig: true,
+    zeroConfigNote: "Works immediately. Uses OS-native secure storage.",
+    credentials: [],
+    tools: [
+      { name: "keychain_get", desc: "Retrieve a secret", inputs: "service, account", approval: false },
+      { name: "keychain_set", desc: "Store a secret", inputs: "service, account, password", approval: true },
+      { name: "keychain_delete", desc: "Delete a secret", inputs: "service, account", approval: true },
+      { name: "keychain_list", desc: "List stored credentials", inputs: "service?", approval: false },
+    ],
+    examples: [
+      { prompt: "Get my GitHub token", tool: "keychain_get" },
+      { prompt: "Store a new API key", tool: "keychain_set" },
+    ],
+    setup: "Zero-config. Uses system keychain. Run with appropriate permissions.",
+  },
+  webhooks: {
+    name: "Webhooks",
+    category: "Developer",
+    description: "Send webhooks and handle incoming webhook events.",
+    longDescription:
+      "Send HTTP POST requests to any URL (webhooks) and optionally handle incoming webhooks. Use for integrations with Slack, Zapier, GitHub Actions, and more.",
+    zeroConfig: true,
+    zeroConfigNote: "Works immediately. Outgoing webhooks always available.",
+    credentials: [],
+    tools: [
+      { name: "webhook_send", desc: "Send a webhook POST request", inputs: "url, payload, headers?", approval: true },
+      { name: "webhook_list", desc: "List registered incoming webhooks", inputs: "", approval: false },
+      { name: "webhook_register", desc: "Register an incoming webhook handler", inputs: "path, handler", approval: false },
+    ],
+    examples: [
+      { prompt: "Send a webhook to Slack with this message", tool: "webhook_send" },
+    ],
+    setup: "Zero-config for outgoing webhooks. Incoming webhooks require server running.",
+  },
+  cron: {
+    name: "Cron",
+    category: "Developer",
+    description: "Schedule and manage recurring tasks.",
+    longDescription:
+      "Schedule AI-powered tasks to run on a cron schedule. Perfect for daily standups, weekly reports, automated backups, and periodic data syncs.",
+    zeroConfig: true,
+    zeroConfigNote: "Works immediately. Runs within the Conductor server process.",
+    credentials: [],
+    tools: [
+      { name: "cron_list", desc: "List all scheduled tasks", inputs: "", approval: false },
+      { name: "cron_add", desc: "Schedule a new task", inputs: "schedule, command, name?", approval: true },
+      { name: "cron_remove", desc: "Remove a scheduled task", inputs: "name", approval: true },
+      { name: "cron_enable", desc: "Enable a scheduled task", inputs: "name", approval: false },
+      { name: "cron_disable", desc: "Disable a scheduled task", inputs: "name", approval: false },
+    ],
+    examples: [
+      { prompt: "Schedule a daily report at 9am", tool: "cron_add" },
+      { prompt: "Show my scheduled tasks", tool: "cron_list" },
+    ],
+    setup: "Zero-config. Cron expressions follow standard format: * * * * *",
+  },
+  aws: {
+    name: "AWS",
+    category: "Cloud",
+    description: "EC2, S3, Lambda, and other AWS services.",
+    longDescription:
+      "Manage AWS resources directly from your AI. List EC2 instances, manage S3 buckets, invoke Lambda functions, and more. Requires AWS credentials.",
+    zeroConfig: false,
+    credentials: [
+      { name: "AWS_ACCESS_KEY_ID", label: "Access Key ID", url: "https://console.aws.amazon.com/iam", required: true },
+      { name: "AWS_SECRET_ACCESS_KEY", label: "Secret Access Key", url: "https://console.aws.amazon.com/iam", required: true },
+      { name: "AWS_REGION", label: "Default Region", url: "e.g., us-east-1", required: false },
+    ],
+    tools: [
+      { name: "aws_ec2_list", desc: "List EC2 instances", inputs: "region?", approval: false },
+      { name: "aws_ec2_start", desc: "Start an EC2 instance", inputs: "instanceId, region?", approval: true },
+      { name: "aws_ec2_stop", desc: "Stop an EC2 instance", inputs: "instanceId, region?", approval: true },
+      { name: "aws_s3_list", desc: "List S3 buckets", inputs: "region?", approval: false },
+      { name: "aws_s3_read", desc: "Read an object from S3", inputs: "bucket, key, region?", approval: false },
+      { name: "aws_s3_write", desc: "Write an object to S3", inputs: "bucket, key, content, region?", approval: true },
+      { name: "aws_lambda_list", desc: "List Lambda functions", inputs: "region?", approval: false },
+      { name: "aws_lambda_invoke", desc: "Invoke a Lambda function", inputs: "functionName, payload?, region?", approval: true },
+    ],
+    examples: [
+      { prompt: "List my EC2 instances", tool: "aws_ec2_list" },
+      { prompt: "Read file from S3 bucket", tool: "aws_s3_read" },
+    ],
+    setup: `conductor plugins setup aws`,
+  },
+  gcp: {
+    name: "GCP",
+    category: "Cloud",
+    description: "Compute Engine, Cloud Storage, Cloud Functions.",
+    longDescription:
+      "Manage Google Cloud Platform resources. List Compute Engine VMs, manage Cloud Storage buckets, and invoke Cloud Functions. Requires GCP service account credentials.",
+    zeroConfig: false,
+    credentials: [
+      { name: "GCP_PROJECT_ID", label: "Project ID", url: "https://console.cloud.google.com", required: true },
+      { name: "GCP_SERVICE_ACCOUNT", label: "Service Account JSON", url: "https://console.cloud.google.com/iam-admin/service-accounts", required: true },
+    ],
+    tools: [
+      { name: "gcp_compute_list", desc: "List Compute Engine instances", inputs: "project?, zone?", approval: false },
+      { name: "gcp_compute_start", desc: "Start a Compute Engine instance", inputs: "instance, project?, zone?", approval: true },
+      { name: "gcp_compute_stop", desc: "Stop a Compute Engine instance", inputs: "instance, project?, zone?", approval: true },
+      { name: "gcp_storage_list", desc: "List Cloud Storage buckets", inputs: "project?", approval: false },
+      { name: "gcp_storage_read", desc: "Read an object from Cloud Storage", inputs: "bucket, object", approval: false },
+      { name: "gcp_storage_write", desc: "Write an object to Cloud Storage", inputs: "bucket, object, content", approval: true },
+      { name: "gcp_functions_list", desc: "List Cloud Functions", inputs: "project?, region?", approval: false },
+      { name: "gcp_functions_invoke", desc: "Invoke a Cloud Function", inputs: "name, payload?, project?, region?", approval: true },
+    ],
+    examples: [
+      { prompt: "List my GCP VMs", tool: "gcp_compute_list" },
+      { prompt: "Read file from Cloud Storage", tool: "gcp_storage_read" },
+    ],
+    setup: `conductor plugins setup gcp`,
+  },
   github: {
     name: "GitHub",
     category: "Developer",

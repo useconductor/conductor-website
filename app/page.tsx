@@ -60,7 +60,7 @@ const aiClients = [
   { name: "Any MCP client", abbr: "MC" },
 ];
 
-const stats = [
+const defaultStats = [
   { value: "15", label: "zero-config tools" },
   { value: "269", label: "tools total" },
   { value: "2", label: "GitHub stars" },
@@ -206,6 +206,20 @@ function Label({ children }: { children: string }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const [stars, setStars] = useState(2);
+  const stats = defaultStats.map((s) =>
+    s.label === "GitHub stars" ? { ...s, value: stars.toString() } : s
+  );
+
+  useEffect(() => {
+    fetch("/api/github-stars")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.total) setStars(data.total);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="relative">
       <NoiseTexture opacity={0.02} />
