@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Shield, Lock, FileCheck, Eye, AlertTriangle, Key } from "lucide-react";
+import { ArrowRight, Shield, Lock, FileCheck, Eye, AlertTriangle, Key, Server, Database } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
 
 const securityCards = [
@@ -8,6 +8,12 @@ const securityCards = [
     title: "AES-256-GCM Encryption",
     description:
       "Secrets are encrypted at rest using AES-256-GCM. Stored in an encrypted local credential store — never in config files.",
+  },
+  {
+    icon: Server,
+    title: "Zero-Knowledge Cloud",
+    description:
+      "Credentials are encrypted on your device before upload. We never see your plaintext keys — only encrypted blobs.",
   },
   {
     icon: Shield,
@@ -38,6 +44,12 @@ const securityCards = [
     title: "Encrypted Credential Store",
     description:
       "Secrets are stored in an encrypted local credential store (AES-256-GCM). Never written to config.json or any plain-text file.",
+  },
+  {
+    icon: Database,
+    title: "Self-Host Option",
+    description:
+      "Run your own Conductor Cloud. Full data sovereignty — your credentials never leave your infrastructure.",
   },
 ];
 
@@ -223,6 +235,45 @@ export default function SecurityPage() {
             configurable rate limits using express-rate-limit. The dashboard,
             webhook, and tool endpoints have independent limits. Defaults are
             100 requests per minute per IP.
+          </p>
+        </section>
+
+        {/* Zero-Knowledge Cloud Sync */}
+        <section>
+          <h2 className="mb-4 font-mono text-xl font-semibold">
+            Zero-Knowledge Cloud Sync
+          </h2>
+          <p className="mb-4 text-sm leading-relaxed text-[#666]">
+            Conductor Cloud uses a zero-knowledge architecture for credential sync:
+          </p>
+          <ol className="space-y-3 mb-6">
+            {[
+              "You set an encryption password in the dashboard or CLI",
+              "Your credentials are encrypted locally using AES-256-GCM with PBKDF2 key derivation",
+              "Only the encrypted blob (ciphertext, IV, salt) is uploaded to the cloud",
+              "On other devices, you enter your password to decrypt credentials locally",
+              "We never see your plaintext API keys — ever",
+            ].map((step, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm text-[#666]">
+                <span className="mt-0.5 shrink-0 font-mono text-xs text-[#2a2a2a]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ol>
+          <div className="rounded-lg border border-green-900/30 bg-green-900/10 p-4">
+            <p className="text-sm text-green-400">
+              <strong>Important:</strong> If you forget your encryption password, your credentials cannot be recovered. 
+              There is no password reset because we never store the plaintext.
+            </p>
+          </div>
+          <p className="mt-4 text-sm text-[#666]">
+            Self-hosting option available — see{" "}
+            <Link href="/docs/cloud" className="text-white hover:underline">
+              Self-Hosting Guide
+            </Link>{" "}
+            to run your own cloud server.
           </p>
         </section>
       </div>
