@@ -10,6 +10,7 @@ const navLinks = [
   { href: "/docs/plugins", label: "Plugins" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/install", label: "Install" },
+  { href: "/dashboard", label: "Dashboard" },
 ];
 
 export function Navbar() {
