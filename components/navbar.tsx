@@ -17,7 +17,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   
-  const shouldHide = pathname.startsWith('/login') || pathname.startsWith('/auth') || pathname === '/';
+  const shouldHide = pathname.startsWith('/login') || pathname.startsWith('/auth');
   
   useEffect(() => {
     if (shouldHide) return;
