@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Terminal, Github, Chrome, ArrowRight, CheckCircle, Shield } from "lucide-react";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,6 +24,12 @@ export default function LoginPage() {
     setError("");
 
     try {
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        setError("Supabase not configured");
+        return;
+      }
+
       const { data, error: authError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -55,6 +61,13 @@ export default function LoginPage() {
 
     setLoading("password");
     setError("");
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      setError("Supabase not configured");
+      setLoading(null);
+      return;
+    }
 
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
