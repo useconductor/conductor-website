@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Search,
   Star,
@@ -174,7 +175,8 @@ const categories = [
 
 function PluginCard({ plugin }: { plugin: Plugin }) {
   return (
-    <SpotlightCard className="group flex flex-col p-5">
+    <Link href={`/docs/plugins/${plugin.name}`}>
+    <SpotlightCard className="group flex flex-col p-5 cursor-pointer">
       <div className="flex items-start gap-3">
         <plugin.icon className="mt-0.5 h-4 w-4 shrink-0 text-[#444]" />
         <div className="min-w-0 flex-1">
@@ -202,12 +204,9 @@ function PluginCard({ plugin }: { plugin: Plugin }) {
             {plugin.rating}
           </span>
         </div>
-        <CopyButton
-          text={plugin.installCmd}
-          className="opacity-0 transition-opacity group-hover:opacity-100"
-        />
       </div>
     </SpotlightCard>
+    </Link>
   );
 }
 

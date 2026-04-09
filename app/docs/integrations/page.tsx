@@ -12,6 +12,17 @@ const aiClients = [
   { name: "GitHub Copilot", slug: "copilot", desc: "VS Code settings or .vscode/mcp.json.", tag: null },
 ];
 
+const nonMCPClients = [
+  { name: "ChatGPT (web)", slug: "chatgpt", desc: "Use webhook triggers via custom actions or Zapier.", tag: "Popular" },
+  { name: "Siri / Apple Intelligence", slug: "siri", desc: "Trigger via Shortcuts app and AppleScript.", tag: null },
+  { name: "Alexa", slug: "alexa", desc: "Custom Alexa Skill with Lambda backend.", tag: null },
+  { name: "Google Assistant", slug: "google-assistant", desc: "Dialogflow or Google Home routines.", tag: null },
+  { name: "Perplexity", slug: "perplexity", desc: "Webhook integration via Zapier/Make.", tag: null },
+  { name: "Mobile AIs", slug: "mobile-ai", desc: "iOS Shortcuts or Android Tasker triggers.", tag: null },
+  { name: "Microsoft Copilot (web)", slug: "copilot-web", desc: "Browser automation or webhook actions.", tag: null },
+  { name: "NotebookLM", slug: "notebooklm", desc: "API integration via Zapier webhooks.", tag: null },
+];
+
 const services = [
   {
     category: "Google",
@@ -118,10 +129,41 @@ export default function IntegrationsPage() {
       <div className="space-y-12">
         <section>
           <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.25em] text-[#333]">
-            AI Clients
+            MCP Clients
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             {aiClients.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/docs/integrations/${c.slug}`}
+                className="group flex items-start justify-between gap-4 rounded-lg border border-[#1a1a1a] bg-[#080808] p-4 transition-colors hover:border-[#2a2a2a]"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-mono text-sm font-semibold text-white">{c.name}</h3>
+                    {c.tag && (
+                      <span className="rounded border border-[#1a1a1a] px-1.5 py-0.5 font-mono text-[9px] text-[#555]">
+                        {c.tag}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-0.5 text-xs text-[#555]">{c.desc}</p>
+                </div>
+                <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#2a2a2a] transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.25em] text-[#333]">
+            Non-MCP Integrations
+          </p>
+          <p className="mb-4 text-sm text-[#666]">
+            These apps don't support MCP directly. Connect via webhooks, Shortcuts, or automation platforms.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {nonMCPClients.map((c) => (
               <Link
                 key={c.slug}
                 href={`/docs/integrations/${c.slug}`}
