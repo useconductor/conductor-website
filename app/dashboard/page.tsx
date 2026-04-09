@@ -1,24 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Terminal, Plus, Trash2, RefreshCw, CheckCircle, 
   XCircle, Shield, Key, Cloud, ChevronRight, Eye, EyeOff,
   Github, MessageSquare, Mail, FileText, CreditCard, TrendingUp,
-  Rocket, ClipboardList, Cloud as CloudIcon, Globe
+  Rocket, ClipboardList, Cloud as CloudIcon, Globe, 
+  Smartphone, Download, Upload, Settings, LogOut, Copy
 } from "lucide-react";
 import { 
   isLoggedIn, getCurrentUser, logout, 
-  getCredentials, storeCredential, deleteCredential, syncCredentials 
+  getCredentials, storeCredential, deleteCredential, syncCredentials,
+  getDevices
 } from "@/lib/cloud-api";
 import { 
   encryptWithPassword, decryptWithPassword, 
-  generateDeviceId, storeCredentialLocal, getCredentialLocal 
+  generateDeviceId, storeCredentialLocal, getCredentialLocal, deleteCredentialLocal
 } from "@/lib/encryption";
 
-// Available plugins that can be configured
 const PLUGINS = [
   { id: "github", name: "GitHub", icon: Github, description: "Issues, PRs, repos" },
   { id: "slack", name: "Slack", icon: MessageSquare, description: "Messages, channels" },
@@ -32,16 +33,30 @@ const PLUGINS = [
   { id: "gcp", name: "GCP", icon: Globe, description: "Compute, Storage" },
 ];
 
-export default function DashboardPage() {
+export const dynamic = 'force-dynamic';
+
+function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pairSuccess = searchParams.get('pair') === 'success';
+  
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [connectedPlugins, setConnectedPlugins] = useState<Set<string>>(new Set());
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showDevicesModal, setShowDevicesModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState<string | null>(null);
+  const [editingPlugin, setEditingPlugin] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState("");
   const [encryptionPassword, setEncryptionPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [newDeviceName, setNewDeviceName] = useState("");
+  const [devices, setDevices] = useState<{id: string, name: string, lastSeen: string}[]>([]);
+  const [showPairSuccess, setShowPairSuccess] = useState(pairSuccess);
+
+  const user = getCurrentUser();
+  const connectedCount = connectedPlugins.size;
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -49,20 +64,30 @@ export default function DashboardPage() {
       return;
     }
 
-    // Load connected plugins from local storage
     const stored = localStorage.getItem('conductor_credentials');
     if (stored) {
       const creds = JSON.parse(stored);
       setConnectedPlugins(new Set(Object.keys(creds)));
     }
+
+    // Load demo devices
+    setDevices([
+      { id: '1', name: 'This Device', lastSeen: new Date().toISOString() },
+    ]);
   }, [router]);
+
+  useEffect(() => {
+    if (showPairSuccess) {
+      const timer = setTimeout(() => setShowPairSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPairSuccess]);
 
   const handleSync = async () => {
     setSyncing(true);
     try {
       const result = await syncCredentials();
       if (result.success && result.data) {
-        // Update connected plugins
         const plugins = new Set(result.data.credentials.map(c => c.plugin));
         setConnectedPlugins(plugins);
       }
@@ -73,22 +98,36 @@ export default function DashboardPage() {
 
   const handleAddCredential = async () => {
     if (!selectedPlugin || !apiKey || !encryptionPassword) {
-      alert("Please fill in all fields");
       return;
     }
 
     setLoading(true);
     try {
-      // Encrypt with password and store locally
       await storeCredentialLocal(selectedPlugin, apiKey, encryptionPassword);
-      
-      // Also store via API (for cloud sync)
       const { encryptedData, iv, salt } = await encryptWithPassword(apiKey, encryptionPassword);
       await storeCredential(selectedPlugin, encryptedData, iv, salt);
-      
       setConnectedPlugins(prev => new Set(Array.from(prev).concat([selectedPlugin])));
       setShowAddModal(false);
       setSelectedPlugin(null);
+      setApiKey("");
+      setEncryptionPassword("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateCredential = async () => {
+    if (!editingPlugin || !apiKey || !encryptionPassword) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await storeCredentialLocal(editingPlugin, apiKey, encryptionPassword);
+      const { encryptedData, iv, salt } = await encryptWithPassword(apiKey, encryptionPassword);
+      await storeCredential(editingPlugin, encryptedData, iv, salt);
+      setShowAddModal(false);
+      setEditingPlugin(null);
       setApiKey("");
       setEncryptionPassword("");
     } finally {
@@ -102,6 +141,7 @@ export default function DashboardPage() {
     }
 
     await deleteCredential(pluginId);
+    deleteCredentialLocal(pluginId);
     setConnectedPlugins(prev => {
       const next = new Set(prev);
       next.delete(pluginId);
@@ -114,8 +154,35 @@ export default function DashboardPage() {
     router.push("/");
   };
 
-  const user = getCurrentUser();
-  const connectedCount = connectedPlugins.size;
+  const handleExport = () => {
+    const data = localStorage.getItem('cloud_credentials') || '{}';
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `conductor-credentials-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportModal(false);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target?.result as string);
+        localStorage.setItem('cloud_credentials', JSON.stringify(data));
+        setConnectedPlugins(new Set(Object.keys(data)));
+        alert('Credentials imported successfully!');
+      } catch {
+        alert('Invalid file format');
+      }
+    };
+    reader.readAsText(file);
+  };
 
   return (
     <div className="min-h-screen bg-[#050505]">
@@ -140,9 +207,17 @@ export default function DashboardPage() {
               {syncing ? 'Syncing...' : 'Sync'}
             </button>
             <button
-              onClick={handleLogout}
-              className="text-sm text-[#666] hover:text-white"
+              onClick={() => setShowDevicesModal(true)}
+              className="flex items-center gap-2 text-sm text-[#666] hover:text-white"
             >
+              <Smartphone className="h-4 w-4" />
+              Devices
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-sm text-[#666] hover:text-white"
+            >
+              <LogOut className="h-4 w-4" />
               Logout
             </button>
             <div className="h-8 w-8 rounded-full bg-[#1a1a1a] flex items-center justify-center font-mono text-xs text-[#666]">
@@ -152,8 +227,16 @@ export default function DashboardPage() {
         </div>
       </header>
 
+      {/* Pair Success Banner */}
+      {showPairSuccess && (
+        <div className="bg-green-900/20 border-b border-green-900 px-6 py-3 flex items-center justify-center">
+          <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+          <span className="text-green-400 text-sm">Device paired successfully!</span>
+        </div>
+      )}
+
       <main className="max-w-6xl mx-auto p-6">
-        {/* Status Cards */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="rounded-lg border border-[#1a1a1a] bg-[#080808] p-6">
             <div className="flex items-center gap-3 mb-2">
@@ -178,173 +261,271 @@ export default function DashboardPage() {
 
           <div className="rounded-lg border border-[#1a1a1a] bg-[#080808] p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Shield className="h-5 w-5 text-[#555]" />
-              <span className="text-[#555] text-sm">Encryption</span>
+              <Smartphone className="h-5 w-5 text-[#555]" />
+              <span className="text-[#555] text-sm">Devices</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              <span className="text-white font-mono">AES-256-GCM</span>
+            <div className="text-white font-mono text-2xl">
+              {devices.length}
             </div>
           </div>
         </div>
 
-        {/* Plugin Credentials */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-mono text-lg font-semibold text-white">Plugin Credentials</h2>
-            <button 
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 text-sm text-[#666] hover:text-white"
+        {/* Actions Bar */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => { setSelectedPlugin(null); setEditingPlugin(null); setShowAddModal(true); }}
+              className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-mono text-sm font-semibold text-black hover:bg-[#e8e8e8]"
             >
               <Plus className="h-4 w-4" />
               Add Credential
             </button>
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="flex items-center gap-2 rounded-lg border border-[#1a1a1a] px-4 py-2 font-mono text-sm text-[#666] hover:text-white"
+            >
+              <Download className="h-4 w-4" />
+              Export
+            </button>
           </div>
-          <div className="rounded-lg border border-[#1a1a1a] overflow-hidden">
-            {PLUGINS.map((plugin, i) => {
-              const isConnected = connectedPlugins.has(plugin.id);
-              return (
-                <div 
-                  key={plugin.id}
-                  className={`flex items-center justify-between p-4 ${i < PLUGINS.length - 1 ? 'border-b border-[#1a1a1a]' : ''}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <plugin.icon className="h-6 w-6 text-[#666]" />
-                    <div>
-                      <p className="font-mono text-sm text-white">{plugin.name}</p>
-                      <p className="text-xs text-[#444]">{plugin.description}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {isConnected ? (
-                      <>
-                        <span className="flex items-center gap-1 text-xs text-green-500">
-                          <CheckCircle className="h-3 w-3" />
-                          Connected
-                        </span>
-                        <button 
-                          onClick={() => handleDeleteCredential(plugin.id)}
-                          className="text-[#444] hover:text-red-500"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <span className="flex items-center gap-1 text-xs text-[#444]">
-                          <XCircle className="h-3 w-3" />
-                          Not connected
-                        </span>
-                        <button 
-                          onClick={() => { setSelectedPlugin(plugin.id); setShowAddModal(true); }}
-                          className="text-xs text-[#666] hover:text-white"
-                        >
-                          Configure
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Security Notice */}
-        <div className="mt-8 p-4 rounded-lg border border-[#1a1a1a] bg-[#080808]">
-          <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-[#555] mt-0.5" />
-            <div>
-              <p className="font-mono text-sm text-white mb-1">Zero-Knowledge Security</p>
-              <p className="text-xs text-[#555]">
-                Your credentials are encrypted on your device before being synced. 
-                Conductor Cloud never sees your API keys in plaintext.
-                Your encryption password is never stored - it stays on your device.
-              </p>
-            </div>
-          </div>
+          <span className="text-[#444] text-sm font-mono">
+            {connectedCount === 0 ? 'No credentials yet' : `${connectedCount} credential${connectedCount > 1 ? 's' : ''} configured`}
+          </span>
         </div>
 
-        {/* Add Credential Modal */}
-        {showAddModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="rounded-xl border border-[#1a1a1a] bg-[#080808] p-6 w-full max-w-md">
-              <h3 className="font-mono text-lg font-semibold text-white mb-4">
-                Add {selectedPlugin ? PLUGINS.find(p => p.id === selectedPlugin)?.name : 'Plugin'} Credential
-              </h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs text-[#555] mb-2 font-mono">PLUGIN</label>
-                  <select
-                    value={selectedPlugin || ""}
-                    onChange={(e) => setSelectedPlugin(e.target.value)}
-                    className="w-full rounded-lg border border-[#1a1a1a] bg-[#050505] py-3 px-4 font-mono text-sm text-white"
+        {/* Plugins List */}
+        <div className="rounded-lg border border-[#1a1a1a] bg-[#080808] overflow-hidden">
+          {PLUGINS.map((plugin, i) => {
+            const isConnected = connectedPlugins.has(plugin.id);
+            return (
+              <div 
+                key={plugin.id}
+                className={`flex items-center justify-between p-4 ${i < PLUGINS.length - 1 ? 'border-b border-[#1a1a1a]' : ''}`}
+              >
+                <div className="flex items-center gap-3">
+                  <plugin.icon className="h-6 w-6 text-[#666]" />
+                  <div>
+                    <p className="font-mono text-sm text-white">{plugin.name}</p>
+                    <p className="text-xs text-[#444]">{plugin.description}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  {isConnected ? (
+                    <>
+                      <span className="flex items-center gap-1 text-xs text-green-500">
+                        <CheckCircle className="h-3 w-3" />
+                        Connected
+                      </span>
+                      <button
+                        onClick={() => { setEditingPlugin(plugin.id); setShowAddModal(true); }}
+                        className="text-xs text-[#666] hover:text-white"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCredential(plugin.id)}
+                        className="text-xs text-red-500 hover:text-red-400"
+                      >
+                        Remove
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => { setSelectedPlugin(plugin.id); setEditingPlugin(null); setShowAddModal(true); }}
+                      className="text-xs text-[#666] hover:text-white"
+                    >
+                      Connect
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Quick Start Guide */}
+        {connectedCount === 0 && (
+          <div className="mt-8 p-6 rounded-lg border border-[#1a1a1a] bg-[#080808]">
+            <h3 className="font-mono text-lg font-bold text-white mb-4">Getting Started</h3>
+            <ol className="space-y-3 text-[#666] text-sm">
+              <li className="flex items-start gap-3">
+                <span className="font-mono text-[#555]">1.</span>
+                <span>Click "Add Credential" above to add your first API key</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="font-mono text-[#555]">2.</span>
+                <span>Choose a plugin and enter your API key</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="font-mono text-[#555]">3.</span>
+                <span>Set an encryption password to secure your credentials</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="font-mono text-[#555]">4.</span>
+                <span>Run <code className="text-white">conductor cloud sync</code> to download credentials on other devices</span>
+              </li>
+            </ol>
+          </div>
+        )}
+      </main>
+
+      {/* Add/Edit Credential Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md rounded-lg border border-[#1a1a1a] bg-[#080808] p-6">
+            <h3 className="font-mono text-xl font-bold text-white mb-4">
+              {editingPlugin ? `Edit ${PLUGINS.find(p => p.id === editingPlugin)?.name}` : selectedPlugin ? `Add ${PLUGINS.find(p => p.id === selectedPlugin)?.name}` : 'Add Credential'}
+            </h3>
+            
+            {!selectedPlugin && !editingPlugin ? (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {PLUGINS.map(plugin => (
+                  <button
+                    key={plugin.id}
+                    onClick={() => setSelectedPlugin(plugin.id)}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg border border-[#1a1a1a] hover:border-[#2a2a2a] text-left"
                   >
-                    <option value="">Select a plugin...</option>
-                    {PLUGINS.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs text-[#555] mb-2 font-mono">API KEY</label>
-                  <input
-                    type="text"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="sk-..."
-                    className="w-full rounded-lg border border-[#1a1a1a] bg-[#050505] py-3 px-4 font-mono text-sm text-white placeholder-[#333]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs text-[#555] mb-2 font-mono">
-                    ENCRYPTION PASSWORD
-                    <span className="text-[#444] font-normal ml-2">(never stored)</span>
-                  </label>
-                  <div className="relative">
+                    <plugin.icon className="h-5 w-5 text-[#666]" />
+                    <span className="text-white font-mono text-sm">{plugin.name}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-[#555] mb-2 font-mono">API KEY</label>
                     <input
                       type={showPassword ? "text" : "password"}
-                      value={encryptionPassword}
-                      onChange={(e) => setEncryptionPassword(e.target.value)}
-                      placeholder="Your secret password"
-                      className="w-full rounded-lg border border-[#1a1a1a] bg-[#050505] py-3 px-4 pr-12 font-mono text-sm text-white placeholder-[#333]"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      placeholder="sk-..."
+                      className="w-full rounded-lg border border-[#1a1a1a] bg-[#050505] py-3 px-4 font-mono text-sm text-white placeholder-[#333]"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#444] hover:text-white"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
                   </div>
-                  <p className="text-xs text-[#444] mt-1">
-                    Used to encrypt your key locally. Required to decrypt later.
-                  </p>
+                  <div>
+                    <label className="block text-xs text-[#555] mb-2 font-mono">ENCRYPTION PASSWORD</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={encryptionPassword}
+                        onChange={(e) => setEncryptionPassword(e.target.value)}
+                        placeholder="Enter a password to encrypt this key"
+                        className="w-full rounded-lg border border-[#1a1a1a] bg-[#050505] py-3 px-4 pr-12 font-mono text-sm text-white placeholder-[#333]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555]"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="flex gap-3 pt-4">
+                <div className="flex items-center gap-3 mt-6">
                   <button
-                    onClick={() => { setShowAddModal(false); setSelectedPlugin(null); setApiKey(""); setEncryptionPassword(""); }}
-                    className="flex-1 rounded-lg border border-[#1a1a1a] py-3 px-4 font-mono text-sm text-[#666] hover:text-white"
+                    onClick={() => { setShowAddModal(false); setSelectedPlugin(null); setEditingPlugin(null); setApiKey(''); setEncryptionPassword(''); }}
+                    className="flex-1 py-3 rounded-lg border border-[#1a1a1a] text-[#666] hover:text-white font-mono text-sm"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={handleAddCredential}
-                    disabled={loading || !selectedPlugin || !apiKey || !encryptionPassword}
-                    className="flex-1 rounded-lg bg-white py-3 px-4 font-mono text-sm font-semibold text-black hover:bg-[#e8e8e8] disabled:opacity-50"
+                    onClick={editingPlugin ? handleUpdateCredential : handleAddCredential}
+                    disabled={loading || !apiKey || !encryptionPassword}
+                    className="flex-1 py-3 rounded-lg bg-white text-black font-mono text-sm font-semibold hover:bg-[#e8e8e8] disabled:opacity-50"
                   >
-                    {loading ? 'Saving...' : 'Save & Encrypt'}
+                    {loading ? 'Saving...' : editingPlugin ? 'Update' : 'Save'}
                   </button>
                 </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Devices Modal */}
+      {showDevicesModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md rounded-lg border border-[#1a1a1a] bg-[#080808] p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-mono text-xl font-bold text-white">Connected Devices</h3>
+              <button onClick={() => setShowDevicesModal(false)} className="text-[#666] hover:text-white">
+                <XCircle className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              {devices.map(device => (
+                <div key={device.id} className="flex items-center justify-between p-4 rounded-lg border border-[#1a1a1a]">
+                  <div className="flex items-center gap-3">
+                    <Smartphone className="h-5 w-5 text-[#666]" />
+                    <div>
+                      <p className="text-white font-mono text-sm">{device.name}</p>
+                      <p className="text-[#444] text-xs">Last seen: {new Date(device.lastSeen).toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => router.push('/login?mode=pair')}
+              className="w-full py-3 rounded-lg border border-[#1a1a1a] text-[#666] hover:text-white font-mono text-sm"
+            >
+              Pair New Device
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md rounded-lg border border-[#1a1a1a] bg-[#080808] p-6">
+            <h3 className="font-mono text-xl font-bold text-white mb-4">Export / Import Credentials</h3>
+            
+            <div className="space-y-4">
+              <button
+                onClick={handleExport}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-[#1a1a1a] text-[#666] hover:text-white font-mono text-sm"
+              >
+                <Download className="h-4 w-4" />
+                Export Encrypted Credentials
+              </button>
+              
+              <div className="relative">
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImport}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <button className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-[#1a1a1a] text-[#666] hover:text-white font-mono text-sm">
+                  <Upload className="h-4 w-4" />
+                  Import Credentials
+                </button>
               </div>
             </div>
+
+            <button
+              onClick={() => setShowExportModal(false)}
+              className="w-full mt-4 py-3 rounded-lg border border-[#1a1a1a] text-[#666] hover:text-white font-mono text-sm"
+            >
+              Close
+            </button>
           </div>
-        )}
-      </main>
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050505] flex items-center justify-center"><p className="text-[#666] font-mono">Loading...</p></div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
