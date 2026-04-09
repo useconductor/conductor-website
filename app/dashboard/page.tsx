@@ -81,8 +81,8 @@ export default function DashboardPage() {
       await storeCredentialLocal(selectedPlugin, apiKey, encryptionPassword);
       
       // Also store via API (for cloud sync)
-      const { encrypted, iv, salt } = await encryptWithPassword(apiKey, encryptionPassword);
-      await storeCredential(selectedPlugin, encrypted, iv, salt);
+      const { encryptedData, iv, salt } = await encryptWithPassword(apiKey, encryptionPassword);
+      await storeCredential(selectedPlugin, encryptedData, iv, salt);
       
       setConnectedPlugins(prev => new Set(Array.from(prev).concat([selectedPlugin])));
       setShowAddModal(false);

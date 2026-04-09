@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Terminal, Github, Chrome, ArrowRight, CheckCircle, Shield } from "lucide-react";
-import { loginWithOAuth, setSession } from "@/lib/cloud-api";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,17 +15,24 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const handleOAuthLogin = async (provider: "github" | "google") => {
+    if (!isSupabaseConfigured()) {
+      setError("Supabase not configured. Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your environment variables.");
+      return;
+    }
+
     setLoading(provider);
     setError("");
 
     try {
-      const result = await loginWithOAuth(provider);
-      
-      if (result.success && result.data) {
-        setSession(result.data.sessionId);
-        router.push("/dashboard");
-      } else {
-        setError(result.error || "Login failed");
+      const { data, error: authError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (authError) {
+        setError(authError.message);
       }
     } catch (err) {
       setError("Something went wrong");
@@ -41,14 +48,28 @@ export default function LoginPage() {
       return;
     }
 
+    if (!isSupabaseConfigured()) {
+      setError("Supabase not configured. Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your environment variables.");
+      return;
+    }
+
     setLoading("password");
     setError("");
 
-    // For demo, create a session directly
-    // In production, this would validate against the API
-    const mockSessionId = `session_${Date.now()}`;
-    setSession(mockSessionId);
-    router.push("/dashboard");
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setLoading(null);
+      return;
+    }
+
+    if (data.user) {
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -254,7 +275,10 @@ export default function LoginPage() {
 
           <div className="mt-8 text-center">
             <p className="text-[#444] text-xs">
-              By continuing, you agree to our Terms of Service and Privacy Policy
+              By continuing, you agree to our{' '}
+              <Link href="/terms" className="underline hover:text-white">Terms of Service</Link>
+              {' '}and{' '}
+              <Link href="/privacy" className="underline hover:text-white">Privacy Policy</Link>
             </p>
           </div>
         </div>

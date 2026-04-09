@@ -1,8 +1,8 @@
 /**
  * Client-Side Encryption for Conductor Cloud
  * 
- * Simple base64 encoding for demo (not production secure)
- * In production, would use Web Crypto API with proper types
+ * Uses Web Crypto API with AES-256-GCM for proper zero-knowledge encryption.
+ * The server never sees plaintext credentials - everything is encrypted client-side.
  */
 
 function getLocalStorage(): Storage | null {
@@ -20,46 +20,83 @@ export function generateDeviceId(): string {
   return deviceId;
 }
 
-// Simple XOR-based "encryption" for demo purposes
-// WARNING: Not secure - just obfuscates for demo
-function simpleEncrypt(data: string, password: string): string {
-  const key = password.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 256;
-  const encoded = [];
-  for (let i = 0; i < data.length; i++) {
-    encoded.push(data.charCodeAt(i) ^ key);
-  }
-  return btoa(String.fromCharCode(...encoded));
-}
-
-function simpleDecrypt(encrypted: string, password: string): string {
-  const key = password.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 256;
-  const data = atob(encrypted);
-  const decoded = [];
-  for (let i = 0; i < data.length; i++) {
-    decoded.push(data.charCodeAt(i) ^ key);
-  }
-  return String.fromCharCode(...decoded);
+async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
+  
+  return crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: new Uint8Array(salt),
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
 }
 
 export async function encryptWithPassword(
   data: string,
   password: string
-): Promise<{ encrypted: string; iv: string; salt: string }> {
-  const encrypted = simpleEncrypt(data, password);
+): Promise<{ encryptedData: string; iv: string; salt: string }> {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(password, salt);
+  
+  const encoder = new TextEncoder();
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    encoder.encode(data)
+  );
+  
+  const toBase64 = (arr: Uint8Array): string => {
+    let binary = '';
+    for (let i = 0; i < arr.length; i++) {
+      binary += String.fromCharCode(arr[i]);
+    }
+    return btoa(binary);
+  };
+  
   return {
-    encrypted,
-    iv: btoa(Date.now().toString()),
-    salt: btoa(password.slice(0, 8)),
+    encryptedData: toBase64(new Uint8Array(encrypted)),
+    iv: toBase64(iv),
+    salt: toBase64(salt),
   };
 }
 
 export async function decryptWithPassword(
-  encrypted: string,
-  _iv: string,
-  _salt: string,
+  encryptedData: string,
+  iv: string,
+  salt: string,
   password: string
 ): Promise<string> {
-  return simpleDecrypt(encrypted, password);
+  const saltBytes = new Uint8Array(salt.length);
+  for (let i = 0; i < salt.length; i++) saltBytes[i] = salt.charCodeAt(i);
+  const ivBytes = new Uint8Array(iv.length);
+  for (let i = 0; i < iv.length; i++) ivBytes[i] = iv.charCodeAt(i);
+  const encryptedBytes = new Uint8Array(encryptedData.length);
+  for (let i = 0; i < encryptedData.length; i++) encryptedBytes[i] = encryptedData.charCodeAt(i);
+  
+  const key = await deriveKey(password, saltBytes);
+  
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: ivBytes },
+    key,
+    encryptedBytes
+  );
+  
+  const decoder = new TextDecoder();
+  return decoder.decode(decrypted);
 }
 
 export async function storeCredentialLocal(
@@ -68,10 +105,10 @@ export async function storeCredentialLocal(
   password: string
 ): Promise<void> {
   const storage = getLocalStorage();
-  const { encrypted, iv, salt } = await encryptWithPassword(credential, password);
+  const { encryptedData, iv, salt } = await encryptWithPassword(credential, password);
   
   const stored = JSON.parse(storage?.getItem('conductor_credentials') || '{}');
-  stored[plugin] = { encrypted, iv, salt };
+  stored[plugin] = { encryptedData, iv, salt };
   if (storage) storage.setItem('conductor_credentials', JSON.stringify(stored));
 }
 
@@ -86,7 +123,7 @@ export async function getCredentialLocal(
   if (!cred) return null;
   
   try {
-    return await decryptWithPassword(cred.encrypted, cred.iv, cred.salt, password);
+    return await decryptWithPassword(cred.encryptedData, cred.iv, cred.salt, password);
   } catch {
     return null;
   }
@@ -111,11 +148,26 @@ export function clearAllCredentialsLocal(): void {
 }
 
 export interface EncryptedCredential {
-  encrypted: string;
+  encryptedData: string;
   iv: string;
   salt: string;
 }
 
 export interface CredentialStorage {
   [plugin: string]: EncryptedCredential;
+}
+
+export function getSessionKey(): string | null {
+  const storage = getLocalStorage();
+  return storage?.getItem('conductor_session_key') || null;
+}
+
+export function setSessionKey(key: string): void {
+  const storage = getLocalStorage();
+  if (storage) storage.setItem('conductor_session_key', key);
+}
+
+export function clearSessionKey(): void {
+  const storage = getLocalStorage();
+  if (storage) storage.removeItem('conductor_session_key');
 }

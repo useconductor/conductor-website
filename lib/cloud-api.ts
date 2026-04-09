@@ -42,7 +42,7 @@ interface EncryptedCredential {
   plugin: string;
   encryptedData: string;
   iv: string;
-  authTag: string;
+  salt: string;
 }
 
 // Session management
@@ -197,13 +197,13 @@ export async function storeCredential(
   plugin: string,
   encryptedData: string,
   iv: string,
-  authTag: string,
+  salt: string,
   deviceId?: string
 ): Promise<ApiResponse<{ credentialId: string }>> {
   // For demo, store in localStorage
   const storage = getLocalStorage();
   const stored = JSON.parse(storage?.getItem('cloud_credentials') || '{}');
-  stored[plugin] = { encryptedData, iv, authTag, updatedAt: new Date().toISOString() };
+  stored[plugin] = { encryptedData, iv, salt, updatedAt: new Date().toISOString() };
   if (storage) storage.setItem('cloud_credentials', JSON.stringify(stored));
 
   return { success: true, data: { credentialId: crypto.randomUUID() } };
@@ -225,7 +225,7 @@ export async function getCredential(plugin: string): Promise<ApiResponse<Encrypt
       plugin,
       encryptedData: cred.encryptedData,
       iv: cred.iv,
-      authTag: cred.authTag,
+      salt: cred.salt,
     },
   };
 }
@@ -249,7 +249,7 @@ export async function syncCredentials(since?: number): Promise<ApiResponse<{ cre
     plugin,
     encryptedData: cred.encryptedData,
     iv: cred.iv,
-    authTag: cred.authTag,
+    salt: cred.salt,
     updatedAt: cred.updatedAt,
   }));
 

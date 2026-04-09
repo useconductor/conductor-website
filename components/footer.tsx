@@ -39,7 +39,7 @@ const columns = [
       },
       {
         label: "Discord",
-        href: "https://discord.gg/conductor",
+        href: "https://discord.gg/9AMpVkk5yv",
         external: true,
       },
       {
@@ -117,7 +117,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-[#0f0f0f] pt-8 md:flex-row md:items-center">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <p className="font-mono text-xs text-[#333]">
               &copy; 2026 Conductor
             </p>
@@ -125,6 +125,10 @@ export function Footer() {
             <p className="font-mono text-xs text-[#333]">Apache-2.0 License</p>
             <span className="text-[#1a1a1a]">/</span>
             <p className="font-mono text-xs text-[#333]">Built by TheAlxLabs</p>
+            <span className="text-[#1a1a1a]">/</span>
+            <Link href="/terms" className="font-mono text-xs text-[#333] hover:text-white">Terms</Link>
+            <span className="text-[#1a1a1a]">/</span>
+            <Link href="/privacy" className="font-mono text-xs text-[#333] hover:text-white">Privacy</Link>
           </div>
           <div className="flex items-center gap-4">
             <span className="rounded-full border border-[#111] px-2.5 py-1 font-mono text-[10px] text-[#333]">
