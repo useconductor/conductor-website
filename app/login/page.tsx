@@ -39,7 +39,7 @@ function LoginForm() {
       const { data, error: authError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: 'https://conductor.thealxlabs.ca/auth/callback',
         },
       });
 
@@ -94,7 +94,7 @@ function LoginForm() {
         }
         if (signUpData.user) {
           setUserSession(signUpData.user.id, email);
-          router.push("/dashboard");
+          router.replace("/dashboard");
           return;
         }
       }
@@ -105,7 +105,7 @@ function LoginForm() {
 
     if (data.user) {
       setUserSession(data.user.id, data.user.email || email);
-      router.push("/dashboard");
+      router.replace("/dashboard");
     }
   };
 
