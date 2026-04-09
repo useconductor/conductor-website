@@ -1,18 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Terminal, Github, Chrome, ArrowRight, CheckCircle, Shield } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Terminal, Github, Chrome, ArrowRight, CheckCircle, Shield, Smartphone } from "lucide-react";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
+import { setUserSession } from "@/lib/cloud-api";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isPairMode = searchParams.get('mode') === 'pair';
   const [loading, setLoading] = useState<string | null>(null);
-  const [step, setStep] = useState<"login" | "password">("login");
+  const [step, setStep] = useState<"login" | "password" | "pair">(isPairMode ? "pair" : "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [pairCode, setPairCode] = useState("");
+  const [deviceName, setDeviceName] = useState("");
 
   const handleOAuthLogin = async (provider: "github" | "google") => {
     if (!isSupabaseConfigured()) {
@@ -75,14 +80,43 @@ export default function LoginPage() {
     });
 
     if (authError) {
+      if (authError.message.includes('Invalid login credentials')) {
+        // Try to sign up instead
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) {
+          setError(signUpError.message);
+          setLoading(null);
+          return;
+        }
+        if (signUpData.user) {
+          setUserSession(signUpData.user.id, email);
+          router.push("/dashboard");
+          return;
+        }
+      }
       setError(authError.message);
       setLoading(null);
       return;
     }
 
     if (data.user) {
+      setUserSession(data.user.id, data.user.email || email);
       router.push("/dashboard");
     }
+  };
+
+  const handlePairDevice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pairCode || !deviceName) {
+      setError("Please enter the pairing code and a name for your device");
+      return;
+    }
+    // In production, this would verify the code with the server
+    // For now, just redirect to dashboard
+    router.push("/dashboard?pair=success");
   };
 
   return (
@@ -126,7 +160,7 @@ export default function LoginPage() {
         </div>
         
         <div className="text-[#333] text-sm">
-          © 2024 Conductor. MIT License.
+          © 2026 Conductor. MIT License.
         </div>
       </div>
 
@@ -286,6 +320,69 @@ export default function LoginPage() {
             </>
           )}
 
+          {step === "pair" && (
+            <>
+              <button
+                onClick={() => setStep("login")}
+                className="text-[#555] hover:text-white text-sm mb-6"
+              >
+                ← Back to login
+              </button>
+
+              <div className="mb-8">
+                <h2 className="font-mono text-2xl font-bold text-white mb-2">Pair a Device</h2>
+                <p className="text-[#666]">
+                  Enter the pairing code from your CLI to sync credentials
+                </p>
+              </div>
+
+              {error && (
+                <div className="mb-4 p-3 rounded-lg border border-red-900/50 bg-red-900/10 text-red-400 text-sm">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handlePairDevice} className="space-y-4">
+                <div>
+                  <label className="block text-xs text-[#555] mb-2 font-mono">DEVICE NAME</label>
+                  <input
+                    type="text"
+                    value={deviceName}
+                    onChange={(e) => setDeviceName(e.target.value)}
+                    placeholder="My MacBook"
+                    className="w-full rounded-lg border border-[#1a1a1a] bg-[#080808] py-3 px-4 font-mono text-sm text-white placeholder-[#333]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-[#555] mb-2 font-mono">PAIRING CODE</label>
+                  <input
+                    type="text"
+                    value={pairCode}
+                    onChange={(e) => setPairCode(e.target.value.toUpperCase())}
+                    placeholder="ABC123"
+                    className="w-full rounded-lg border border-[#1a1a1a] bg-[#080808] py-3 px-4 font-mono text-sm text-white placeholder-[#333]"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading === "pair"}
+                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-white py-3 px-4 font-mono text-sm font-semibold text-black hover:bg-[#e8e8e8] transition-colors disabled:opacity-50"
+                >
+                  {loading === "pair" ? (
+                    "Pairing..."
+                  ) : (
+                    <>
+                      <Smartphone className="h-4 w-4" />
+                      Pair Device
+                    </>
+                  )}
+                </button>
+              </form>
+            </>
+          )}
+
           <div className="mt-8 text-center">
             <p className="text-[#444] text-xs">
               By continuing, you agree to our{' '}
@@ -297,5 +394,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#050505]"><p className="text-[#666]">Loading...</p></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
