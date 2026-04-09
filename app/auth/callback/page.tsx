@@ -6,6 +6,8 @@ import { Loader2 } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { setUserSession } from "@/lib/cloud-api";
 
+export const dynamic = 'force-dynamic';
+
 export default function AuthCallback() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +32,8 @@ export default function AuthCallback() {
       if (session?.user) {
         // Set user session
         setUserSession(session.user.id, session.user.email || '');
+        // Small delay to ensure localStorage is persisted
+        await new Promise(r => setTimeout(r, 100));
         router.replace("/dashboard");
         return;
       }
