@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Terminal, Github } from "lucide-react";
 
 const columns = [
@@ -52,12 +55,16 @@ const columns = [
 ];
 
 export function Footer() {
+  const pathname = usePathname();
+  
+  if (pathname.startsWith('/login') || pathname.startsWith('/auth')) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-[#1a1a1a] bg-[#050505]">
       <div className="mx-auto max-w-6xl px-6 py-14">
-        {/* Top: logo + cols */}
         <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
-          {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link
               href="/"
@@ -82,7 +89,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Link columns */}
           {columns.map((col) => (
             <div key={col.title}>
               <h3 className="mb-4 font-mono text-xs font-semibold uppercase tracking-widest text-[#333]">
@@ -115,7 +121,6 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Bottom bar */}
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-[#0f0f0f] pt-8 md:flex-row md:items-center">
           <div className="flex flex-wrap items-center gap-4">
             <p className="font-mono text-xs text-[#333]">

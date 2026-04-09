@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Menu, X, Github, Terminal, ChevronDown } from "lucide-react";
+import { Menu, X, Github, Terminal } from "lucide-react";
 
 const navLinks = [
   { href: "/docs", label: "Docs" },
@@ -16,6 +16,11 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+
+  // Don't show navbar on auth pages
+  if (pathname.startsWith('/login') || pathname.startsWith('/auth')) {
+    return null;
+  }
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 8);
