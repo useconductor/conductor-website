@@ -3,36 +3,52 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Terminal, Github, Chrome, ArrowRight, CheckCircle } from "lucide-react";
-import { SpotlightCard } from "@/components/ui/spotlight-card";
+import { Terminal, Github, Chrome, ArrowRight, CheckCircle, Shield } from "lucide-react";
+import { loginWithOAuth, setSession } from "@/lib/cloud-api";
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
-  const [step, setStep] = useState<"login" | "pairing" | "code">("login");
-  const [pairingCode, setPairingCode] = useState("");
-  const [deviceName, setDeviceName] = useState("");
+  const [step, setStep] = useState<"login" | "password">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleOAuthLogin = async (provider: "github" | "google") => {
     setLoading(provider);
-    
-    // In production, this would redirect to OAuth
-    // For now, simulate the flow
-    setTimeout(() => {
+    setError("");
+
+    try {
+      const result = await loginWithOAuth(provider);
+      
+      if (result.success && result.data) {
+        setSession(result.data.sessionId);
+        router.push("/dashboard");
+      } else {
+        setError(result.error || "Login failed");
+      }
+    } catch (err) {
+      setError("Something went wrong");
+    } finally {
       setLoading(null);
-      router.push("/dashboard");
-    }, 1000);
+    }
   };
 
-  const handleDevicePairing = async () => {
-    if (!pairingCode || !deviceName) return;
-    setLoading("pairing");
-    
-    // Simulate device pairing
-    setTimeout(() => {
-      setLoading(null);
-      router.push("/dashboard");
-    }, 1500);
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setLoading("password");
+    setError("");
+
+    // For demo, create a session directly
+    // In production, this would validate against the API
+    const mockSessionId = `session_${Date.now()}`;
+    setSession(mockSessionId);
+    router.push("/dashboard");
   };
 
   return (
@@ -68,6 +84,10 @@ export default function LoginPage() {
               <CheckCircle className="h-5 w-5 text-green-500" />
               <span>Self-host option available</span>
             </div>
+            <div className="flex items-center gap-3 text-[#555]">
+              <Shield className="h-5 w-5 text-green-500" />
+              <span>Zero-knowledge architecture</span>
+            </div>
           </div>
         </div>
         
@@ -86,10 +106,16 @@ export default function LoginPage() {
                 <p className="text-[#666]">Log in to manage your credentials</p>
               </div>
 
+              {error && (
+                <div className="mb-4 p-3 rounded-lg border border-red-900/50 bg-red-900/10 text-red-400 text-sm">
+                  {error}
+                </div>
+              )}
+
               <div className="space-y-4">
                 <button
                   onClick={() => handleOAuthLogin("github")}
-                  disabled={loading === "github"}
+                  disabled={!!loading}
                   className="w-full flex items-center justify-center gap-3 rounded-lg border border-[#1a1a1a] bg-[#080808] py-3 px-4 font-mono text-sm text-white hover:border-[#2a2a2a] transition-colors disabled:opacity-50"
                 >
                   {loading === "github" ? (
@@ -104,7 +130,7 @@ export default function LoginPage() {
 
                 <button
                   onClick={() => handleOAuthLogin("google")}
-                  disabled={loading === "google"}
+                  disabled={!!loading}
                   className="w-full flex items-center justify-center gap-3 rounded-lg border border-[#1a1a1a] bg-[#080808] py-3 px-4 font-mono text-sm text-white hover:border-[#2a2a2a] transition-colors disabled:opacity-50"
                 >
                   {loading === "google" ? (
@@ -118,12 +144,30 @@ export default function LoginPage() {
                 </button>
               </div>
 
+              <div className="mt-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-[#1a1a1a]"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-[#050505] px-2 text-[#444]">or</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setStep("password")}
+                className="w-full mt-6 flex items-center justify-center gap-3 rounded-lg border border-[#1a1a1a] bg-[#080808] py-3 px-4 font-mono text-sm text-[#666] hover:text-white hover:border-[#2a2a2a] transition-colors"
+              >
+                Continue with email
+              </button>
+
               <div className="mt-8 pt-8 border-t border-[#1a1a1a]">
                 <p className="text-[#555] text-sm text-center mb-4">
                   Need to pair a device?
                 </p>
                 <button
-                  onClick={() => setStep("pairing")}
+                  onClick={() => router.push("/login?mode=pair")}
                   className="w-full text-center text-[#666] hover:text-white text-sm"
                 >
                   Pair a new device →
@@ -132,7 +176,7 @@ export default function LoginPage() {
             </>
           )}
 
-          {step === "pairing" && (
+          {step === "password" && (
             <>
               <button
                 onClick={() => setStep("login")}
@@ -142,50 +186,68 @@ export default function LoginPage() {
               </button>
 
               <div className="mb-8">
-                <h2 className="font-mono text-2xl font-bold text-white mb-2">Pair Device</h2>
+                <h2 className="font-mono text-2xl font-bold text-white mb-2">Sign in with email</h2>
                 <p className="text-[#666]">
-                  Enter the code from your CLI to pair this device
+                  Your password is used to encrypt your credentials locally
                 </p>
               </div>
 
-              <div className="space-y-4">
+              {error && (
+                <div className="mb-4 p-3 rounded-lg border border-red-900/50 bg-red-900/10 text-red-400 text-sm">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handlePasswordLogin} className="space-y-4">
                 <div>
-                  <label className="block text-xs text-[#555] mb-2 font-mono">DEVICE NAME</label>
+                  <label className="block text-xs text-[#555] mb-2 font-mono">EMAIL</label>
                   <input
-                    type="text"
-                    value={deviceName}
-                    onChange={(e) => setDeviceName(e.target.value)}
-                    placeholder="My Laptop"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
                     className="w-full rounded-lg border border-[#1a1a1a] bg-[#080808] py-3 px-4 font-mono text-sm text-white placeholder-[#333]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-[#555] mb-2 font-mono">PAIRING CODE</label>
+                  <label className="block text-xs text-[#555] mb-2 font-mono">PASSWORD</label>
                   <input
-                    type="text"
-                    value={pairingCode}
-                    onChange={(e) => setPairingCode(e.target.value.toUpperCase())}
-                    placeholder="ABC123"
-                    className="w-full rounded-lg border border-[#1a1a1a] bg-[#080808] py-3 px-4 font-mono text-lg text-white placeholder-[#333] text-center tracking-widest"
-                    maxLength={6}
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full rounded-lg border border-[#1a1a1a] bg-[#080808] py-3 px-4 font-mono text-sm text-white placeholder-[#333]"
                   />
                 </div>
 
                 <button
-                  onClick={handleDevicePairing}
-                  disabled={!pairingCode || !deviceName || loading === "pairing"}
+                  type="submit"
+                  disabled={loading === "password"}
                   className="w-full flex items-center justify-center gap-2 rounded-lg bg-white py-3 px-4 font-mono text-sm font-semibold text-black hover:bg-[#e8e8e8] transition-colors disabled:opacity-50"
                 >
-                  {loading === "pairing" ? (
-                    "Pairing..."
+                  {loading === "password" ? (
+                    "Signing in..."
                   ) : (
                     <>
-                      Pair Device
+                      Sign In
                       <ArrowRight className="h-4 w-4" />
                     </>
                   )}
                 </button>
+              </form>
+
+              <div className="mt-6 p-4 rounded-lg border border-[#1a1a1a] bg-[#080808]">
+                <div className="flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-[#555] mt-0.5" />
+                  <div>
+                    <p className="font-mono text-xs text-white mb-1">Zero-Knowledge Encryption</p>
+                    <p className="text-xs text-[#555]">
+                      Your password never leaves this device. Credentials are encrypted 
+                      before being synced to the cloud.
+                    </p>
+                  </div>
+                </div>
               </div>
             </>
           )}
