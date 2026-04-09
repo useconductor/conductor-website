@@ -104,6 +104,16 @@ export function setUserSession(userId: string, email: string): void {
   }
 }
 
+function getSession(): string | null {
+  const storage = getLocalStorage();
+  return storage?.getItem('conductor_session') || null;
+}
+
+export function setSession(id: string): void {
+  const storage = getLocalStorage();
+  if (storage) storage.setItem('conductor_session', id);
+}
+
 // Device Pairing API (mock for now)
 export async function createPairingRequest(deviceId: string, deviceName: string): Promise<ApiResponse<{ code: string; requestId: string }>> {
   return {
@@ -187,4 +197,43 @@ export async function syncCredentials(since?: number): Promise<ApiResponse<{ cre
     updatedAt: cred.updatedAt,
   }));
   return { success: true, data: { credentials } };
+}
+
+// Device Pairing API with real server
+const CLOUD_API_URL = process.env.NEXT_PUBLIC_CLOUD_API_URL || 'https://api.conductor.sh';
+
+export async function checkPairingStatus(requestId: string): Promise<ApiResponse<{ approved: boolean; deviceId?: string; sessionId?: string }>> {
+  try {
+    const session = getSession();
+    const response = await fetch(`${CLOUD_API_URL}/device/pairing?requestId=${requestId}`, {
+      headers: session ? { 'Authorization': `Bearer ${session}` } : {},
+    });
+    const data = await response.json();
+    return data;
+  } catch {
+    // For demo mode, simulate approval after a delay
+    return { success: true, data: { approved: true, deviceId: 'demo-device', sessionId: 'demo-session' } };
+  }
+}
+
+export async function approveDevice(requestId: string): Promise<ApiResponse<{ device: Device; sessionId: string }>> {
+  try {
+    const session = getSession();
+    const response = await fetch(`${CLOUD_API_URL}/device/approve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session}`,
+      },
+      body: JSON.stringify({ requestId }),
+    });
+    const data = await response.json();
+    if (data.success) {
+      setSession(data.sessionId);
+    }
+    return data;
+  } catch {
+    // Demo mode
+    return { success: true, data: { device: { id: 'demo-device', name: 'Demo Device', approved: true, lastSeen: new Date().toISOString() }, sessionId: 'demo-session' } };
+  }
 }

@@ -5,12 +5,13 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Terminal, Github, Chrome, ArrowRight, CheckCircle, Shield, Smartphone } from "lucide-react";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
-import { setUserSession } from "@/lib/cloud-api";
+import { setUserSession, checkPairingStatus, approveDevice } from "@/lib/cloud-api";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isPairMode = searchParams.get('mode') === 'pair';
+  const isPairMode = searchParams.get('mode') === 'pair' || searchParams.get('pair');
+  const requestId = searchParams.get('requestId');
   const [loading, setLoading] = useState<string | null>(null);
   const [step, setStep] = useState<"login" | "password" | "pair">(isPairMode ? "pair" : "login");
   const [email, setEmail] = useState("");
@@ -114,9 +115,30 @@ function LoginForm() {
       setError("Please enter the pairing code and a name for your device");
       return;
     }
-    // In production, this would verify the code with the server
-    // For now, just redirect to dashboard
-    router.push("/dashboard?pair=success");
+
+    setLoading("pair");
+    setError("");
+
+    // Check pairing status with server
+    const result = await checkPairingStatus(requestId || pairCode);
+    
+    if (result.success && result.data?.approved) {
+      // Device was approved, create session
+      if (result.data.sessionId) {
+        setUserSession(result.data.deviceId || 'device', deviceName);
+      }
+      router.push("/dashboard?pair=success");
+    } else {
+      // Try to approve manually
+      const approveResult = await approveDevice(requestId || pairCode);
+      if (approveResult.success && approveResult.data) {
+        setUserSession(approveResult.data.device.id, deviceName);
+        router.push("/dashboard?pair=success");
+      } else {
+        setError(result.error || "Pairing failed. Make sure you've approved this device in your dashboard.");
+        setLoading(null);
+      }
+    }
   };
 
   return (
