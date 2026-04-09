@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { Menu, X, Github, Terminal } from "lucide-react";
 
 const navLinks = [
@@ -13,20 +13,20 @@ const navLinks = [
 ];
 
 export function Navbar() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const pathname = usePathname();
-
-  // Don't show navbar on auth pages
-  if (pathname.startsWith('/login') || pathname.startsWith('/auth')) {
-    return null;
-  }
-
+  
+  const shouldHide = pathname.startsWith('/login') || pathname.startsWith('/auth') || pathname === '/';
+  
   useEffect(() => {
+    if (shouldHide) return;
     const handler = () => setScrolled(window.scrollY > 8);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
-  }, []);
+  }, [shouldHide]);
+
+  if (shouldHide) return null;
 
   return (
     <header
@@ -37,7 +37,6 @@ export function Navbar() {
       }`}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-        {/* Logo */}
         <Link
           href="/"
           className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight text-white transition-opacity hover:opacity-80"
@@ -49,7 +48,6 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
         <nav className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => {
             const active =
@@ -69,7 +67,6 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Desktop actions */}
         <div className="hidden items-center gap-3 md:flex">
           <a
             href="https://github.com/useconductor/conductor"
@@ -89,7 +86,6 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile toggle */}
         <button
           className="text-[#666] md:hidden"
           onClick={() => setOpen(!open)}
@@ -99,7 +95,6 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {open && (
         <div className="border-t border-[#1a1a1a] bg-[#050505] px-6 py-5 md:hidden">
           <nav className="flex flex-col gap-4">
