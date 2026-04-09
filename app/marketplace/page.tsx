@@ -175,7 +175,7 @@ const categories = [
 
 function PluginCard({ plugin }: { plugin: Plugin }) {
   return (
-    <Link href={`/docs/plugins/${plugin.name}`}>
+    <Link href={`/marketplace/${plugin.name}`}>
     <SpotlightCard className="group flex flex-col p-5 cursor-pointer">
       <div className="flex items-start gap-3">
         <plugin.icon className="mt-0.5 h-4 w-4 shrink-0 text-[#444]" />
