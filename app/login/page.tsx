@@ -408,10 +408,10 @@ function LoginForm() {
                   {loading === "pair" ? (
                     "Pairing..."
                   ) : (
-                    <>
+                    <span className="flex items-center gap-2">
                       <Smartphone className="h-4 w-4" />
                       Pair Device
-                    </>
+                    </span>
                   )}
                 </button>
               </form>
@@ -434,7 +434,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#050505]"><p className="text-[#666]">Loading...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#050505]"><p className="text-[#666] font-mono">Loading...</p></div>}>
       <LoginForm />
     </Suspense>
   );
