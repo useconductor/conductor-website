@@ -7,6 +7,7 @@ import { Menu, X, Github, Terminal, ChevronDown } from "lucide-react";
 
 const navLinks = [
   { href: "/docs", label: "Docs" },
+  { href: "/docs/plugins", label: "Plugins" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/install", label: "Install" },
 ];
