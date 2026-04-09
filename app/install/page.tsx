@@ -35,7 +35,7 @@ const installMethods: InstallMethod[] = [
   {
     title: "Install script",
     description: "Standalone binary. No Node.js required.",
-    command: "curl -fsSL https://conductor.dev/install.sh | sh",
+    command: "curl -fsSL https://conductor.thealxlabs.ca/install.sh | sh",
     icon: Download,
   },
 ];
