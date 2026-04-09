@@ -33,6 +33,7 @@ type PluginDoc = {
   credentials: Credential[];
   tools: Tool[];
   examples: Example[];
+  install?: string;
   setup?: string;
 };
 
@@ -62,6 +63,7 @@ const PLUGINS: Record<string, PluginDoc> = {
       { prompt: "Create a new file called notes.txt", tool: "fs_write" },
       { prompt: "Find all TypeScript files in src/", tool: "fs_search" },
     ],
+    install: "Built-in — no installation needed. Works immediately.",
     setup: "Zero-config. Sandboxed to working directory by default.",
   },
   git: {
@@ -90,6 +92,7 @@ const PLUGINS: Record<string, PluginDoc> = {
       { prompt: "Commit my changes with a message", tool: "git_commit" },
       { prompt: "Show me the last 5 commits", tool: "git_log" },
     ],
+    install: "Built-in — no installation needed. Works immediately.",
     setup: "Zero-config. Requires git CLI installed and initialized repository.",
   },
   "web-fetch": {
@@ -110,6 +113,7 @@ const PLUGINS: Record<string, PluginDoc> = {
       { prompt: "What's on example.com?", tool: "web_fetch" },
       { prompt: "Get the JSON from this API endpoint", tool: "web_json" },
     ],
+    install: "Built-in — no installation needed. Works immediately.",
     setup: "Zero-config. Rate limited to 100 requests/minute.",
   },
   database: {
@@ -133,6 +137,7 @@ const PLUGINS: Record<string, PluginDoc> = {
       { prompt: "What tables are in my database?", tool: "db_tables" },
       { prompt: "Run this SQL query", tool: "db_query" },
     ],
+    install: "Built-in — no installation needed. Works immediately.",
     setup: `conductor config set plugins.database.url "postgresql://user:pass@host/db"
 # Or for SQLite (no config needed):
 conductor config set plugins.database.type "sqlite"`,
@@ -158,6 +163,7 @@ conductor config set plugins.database.type "sqlite"`,
       { prompt: "Create a note called 'meeting-notes' with today's notes", tool: "notes_create" },
       { prompt: "Find all notes about AI", tool: "notes_search" },
     ],
+    install: "Built-in — no installation needed. Works immediately.",
     setup: "Zero-config. Notes stored in ~/.conductor/notes/",
   },
   keychain: {
@@ -179,6 +185,7 @@ conductor config set plugins.database.type "sqlite"`,
       { prompt: "Get my GitHub token", tool: "keychain_get" },
       { prompt: "Store a new API key", tool: "keychain_set" },
     ],
+    install: "Built-in — no installation needed. Works immediately.",
     setup: "Zero-config. Uses system keychain. Run with appropriate permissions.",
   },
   webhooks: {
@@ -198,6 +205,7 @@ conductor config set plugins.database.type "sqlite"`,
     examples: [
       { prompt: "Send a webhook to Slack with this message", tool: "webhook_send" },
     ],
+    install: "Built-in — no installation needed. Works immediately.",
     setup: "Zero-config for outgoing webhooks. Incoming webhooks require server running.",
   },
   cron: {
@@ -220,6 +228,7 @@ conductor config set plugins.database.type "sqlite"`,
       { prompt: "Schedule a daily report at 9am", tool: "cron_add" },
       { prompt: "Show my scheduled tasks", tool: "cron_list" },
     ],
+    install: "Built-in — no installation needed. Works immediately.",
     setup: "Zero-config. Cron expressions follow standard format: * * * * *",
   },
   aws: {
@@ -248,6 +257,7 @@ conductor config set plugins.database.type "sqlite"`,
       { prompt: "List my EC2 instances", tool: "aws_ec2_list" },
       { prompt: "Read file from S3 bucket", tool: "aws_s3_read" },
     ],
+    install: "Built-in — no installation needed. Enable with conductor plugins enable aws",
     setup: `conductor plugins setup aws`,
   },
   gcp: {
@@ -275,6 +285,7 @@ conductor config set plugins.database.type "sqlite"`,
       { prompt: "List my GCP VMs", tool: "gcp_compute_list" },
       { prompt: "Read file from Cloud Storage", tool: "gcp_storage_read" },
     ],
+    install: "Built-in — no installation needed. Enable with conductor plugins enable gcp",
     setup: `conductor plugins setup gcp`,
   },
   github: {
@@ -357,6 +368,7 @@ conductor plugins setup github`,
       { prompt: "What were the last 10 messages in #engineering?", tool: "slack_read" },
       { prompt: "List all channels in the workspace", tool: "slack_channels" },
     ],
+    install: "Built-in — enable with conductor plugins enable slack",
     setup: `# 1. Go to api.slack.com/apps and create a new app
 # 2. Add OAuth scopes: channels:read, channels:history, chat:write, users:read
 # 3. Install the app to your workspace and copy the Bot Token
@@ -397,6 +409,7 @@ conductor plugins setup slack`,
       { prompt: "Send an email to john@example.com about the meeting", tool: "gmail_send" },
       { prompt: "Find emails from my bank in the last 30 days", tool: "gmail_search" },
     ],
+    install: "Built-in — enable with conductor plugins enable gmail",
     setup: `# 1. Enable Gmail API at console.cloud.google.com
 # 2. Create OAuth 2.0 credentials (Desktop app type)
 # 3. Run setup — it will open a browser for OAuth consent:
@@ -1135,6 +1148,14 @@ export default async function PluginDetailPage({ params }: Props) {
                 <code>{plugin.setup}</code>
               </pre>
             </div>
+          </section>
+        )}
+
+        {/* Install */}
+        {plugin.install && (
+          <section>
+            <h2 className="mb-4 font-mono text-xl font-semibold">Install</h2>
+            <p className="text-sm text-[#666]">{plugin.install}</p>
           </section>
         )}
 
